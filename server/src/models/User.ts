@@ -4,6 +4,7 @@ export interface IUser extends Document {
   email: string;
   fullName: string;
   password: string;
+  avatar : string
   isVerified: boolean;
   plan: 'free' | 'pro' | 'team';
   subscriptionStatus: 'active' | 'cancelled';
@@ -28,6 +29,10 @@ const userSchema: Schema<IUser> = new Schema({
     type: String,
     required: true,
     trim: true
+  },
+  avatar:{
+    type: String,
+    default: ''
   },
   password: {
     type: String,
