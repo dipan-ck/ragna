@@ -1,0 +1,15 @@
+# Node server
+/server/node_modules/
+/server/dist/
+/server/.env
+
+# Next.js frontend
+/client/.next/
+/client/node_modules/
+/client/.env.local
+/client/public/build
+
+# General
+.DS_Store
+*.log
+.env
