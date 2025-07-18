@@ -6,6 +6,7 @@ export interface IUser extends Document {
   password: string;
   avatar : string
   isVerified: boolean;
+  isOAuth: boolean;
   plan: 'free' | 'pro' | 'team';
   subscriptionStatus: 'active' | 'cancelled';
   stripeCustomerId?: string;
@@ -36,7 +37,13 @@ const userSchema: Schema<IUser> = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: function () {
+      return !this.isOAuth;  
+    },
+  },
+   isOAuth: {
+    type: Boolean,
+    default: false,
   },
   isVerified: {
     type: Boolean,

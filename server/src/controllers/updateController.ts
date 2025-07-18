@@ -10,6 +10,7 @@ import {
   requestPasswordResetSchema,
   verifyPasswordResetSchema,
 } from "schemas/updateSchema";
+import { success } from 'zod';
 
 
 export const updateProfileImage = async (req: Request, res: Response) => {
@@ -156,19 +157,21 @@ export async function requestPasswordReset(req: Request, res: Response) {
 
   const parse = requestPasswordResetSchema.safeParse(req.body);
   if (!parse.success) {
-    return res.status(400).json({ message: "Invalid email", errors: parse.error.errors });
+    return res.status(400).json({success:false, message: "Invalid email", errors: parse.error.errors });
   }
   const { email } = parse.data;
 
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(404).json({ message: "User not found." });
+    return res.status(404).json({ success: false, message: "User not found." });
   }
 
   const otp = generateOTP();
   otpMap.set(email, otp);
 
   await sendOtpEmail(email, otp);
+  console.log(`OTP for password reset sent to ${email}: ${otp}`);
+  
 
   return res.status(200).json({
     success: true,

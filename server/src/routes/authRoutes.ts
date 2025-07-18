@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
-import { googleAuth, loginUser, logOutUser, registerUser, resendOTP, verifyOTP } from '../controllers/authController';
+import { googleAuth, loginUser, logOutUser, registerUser, resendOTP, validateUser, verifyOTP } from '../controllers/authController';
 import { authLimiter } from 'middlewares/rateLimiter';
+import verifyAuth from 'middlewares/verifyAuth';
 
 const router: Router = express.Router();
 
@@ -10,6 +11,7 @@ router.post("/verify-otp",authLimiter, verifyOTP);
 router.get("/logout",authLimiter, logOutUser);
 router.post("/resend-otp",authLimiter, resendOTP);
 router.post("/google",authLimiter, googleAuth);
+router.get("/me", verifyAuth, validateUser);
 
 export default router;
 

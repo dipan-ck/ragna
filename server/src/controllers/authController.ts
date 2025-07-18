@@ -11,11 +11,14 @@ import { registerSchema, loginSchema, otpSchema, resendOtpSchema, googleAuthSche
 
 export async function registerUser(req: Request,res: Response): Promise<Response> {
 
- const parse = registerSchema.safeParse(req.body);
-  if (!parse.success) {
-    return res.status(400).json({ success: false, message: "Invalid input", errors: parse.error.errors });
-  }
 
+const parse = registerSchema.safeParse(req.body);
+
+if (!parse.success) {
+  console.log("Validation error:", parse.error.format()); // this is much more readable
+  return res.status(400).json({ success: false, message: "Invalid input", errors: parse.error.errors });
+}
+   
   const { email, password, fullName } = parse.data;
 
   try {
@@ -229,17 +232,91 @@ export async function resendOTP(req: Request, res: Response) {
   }
 }
 
-export async function googleAuth(req: Request, res: Response) {
-  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+// export async function googleAuth(req: Request, res: Response) {
+//   const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
  
-    const parse = googleAuthSchema.safeParse(req.body);
-  if (!parse.success) {
-    return res.status(400).json({ success: false, message: "Invalid token", errors: parse.error.errors });
+//     const parse = googleAuthSchema.safeParse(req.body);
+//   if (!parse.success) {
+//     return res.status(400).json({ success: false, message: "Invalid token", errors: parse.error.errors });
+//   }
+
+//   const { idToken } = parse.data;
+
+//   try {
+//     const ticket = await client.verifyIdToken({
+//       idToken,
+//       audience: process.env.GOOGLE_CLIENT_ID,
+//     });
+
+//     const payload = ticket.getPayload();
+
+//     if (!payload || !payload.email || !payload.name) {
+//       return res.status(400).json({ success: false, message: 'Invalid token' });
+//     }
+
+//     const { email, name, picture } = payload;
+
+//     let user = await User.findOne({ email });
+
+//     if (!user) {
+//       // Create user if doesn't exist
+//       user = await User.create({
+//         email,
+//         fullName: name,
+//         isVerified: true, // Google verified
+//         password: '',     // No password
+//         avatar: picture,
+//         isOAuth: true
+//       });
+//     }
+
+//     // generate your JWT token
+//     const token = generateToken(user._id.toString());
+
+//     // set cookie or send token
+//     res.cookie('token', token, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === 'production',
+//       sameSite: 'strict',
+//       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+//     });
+
+//     return res.status(200).json({ success: true, message: 'Logged in Successfully' });
+
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(401).json({ success: false, message: 'Google authentication failed' });
+//   }
+// }
+
+
+export async function googleAuth(req: Request, res: Response) {
+  const client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET, 
+    'postmessage'
+  );
+
+  
+  const { authCode } = req.body;
+
+ 
+  if (!authCode || typeof authCode !== 'string' || authCode.trim() === '') {
+    return res.status(400).json({ success: false, message: "Invalid authorization code provided." });
   }
 
-  const { idToken } = parse.data;
-
   try {
+   
+    const { tokens } = await client.getToken(authCode);
+
+ 
+    const idToken = tokens.id_token;
+
+    if (!idToken) {
+      return res.status(400).json({ success: false, message: 'No ID token received from Google after exchange.' });
+    }
+
+
     const ticket = await client.verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -248,7 +325,7 @@ export async function googleAuth(req: Request, res: Response) {
     const payload = ticket.getPayload();
 
     if (!payload || !payload.email || !payload.name) {
-      return res.status(400).json({ success: false, message: 'Invalid token' });
+      return res.status(400).json({ success: false, message: 'Invalid token payload or missing data.' });
     }
 
     const { email, name, picture } = payload;
@@ -256,20 +333,20 @@ export async function googleAuth(req: Request, res: Response) {
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Create user if doesn't exist
       user = await User.create({
         email,
         fullName: name,
-        isVerified: true, // Google verified
-        password: '',     // No password
-        avatar: picture
+        isVerified: true, 
+        password: '',     
+        avatar: picture,
+        isOAuth: true
       });
     }
 
-    // generate your JWT token
+  
     const token = generateToken(user._id.toString());
 
-    // set cookie or send token
+  
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -277,10 +354,48 @@ export async function googleAuth(req: Request, res: Response) {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    return res.status(200).json({ success: true, message: 'Logged in with Google' });
+    return res.status(200).json({ success: true, message: 'Logged in Successfully' });
 
-  } catch (err) {
-    console.error(err);
-    return res.status(401).json({ success: false, message: 'Google authentication failed' });
+  } catch (err: any) {
+    console.error("Google authentication error:", err.message);
+    let errorMessage = 'Google authentication failed';
+    if (err.message.includes('invalid_grant')) {
+        errorMessage = 'Invalid authorization code or code already used. Please try again.';
+    } else if (err.code === 400 && err.errors && Array.isArray(err.errors)) {
+      // This part might still be relevant if Google's API returns specific errors
+      errorMessage = err.errors[0].message || errorMessage;
+    }
+    return res.status(401).json({ success: false, message: errorMessage });
   }
+}
+
+
+export async function validateUser(req : Request, res: Response){
+  const userId = req.user?.id;
+
+  try{
+
+    const user = await User.findById(userId);
+
+    if(!user){
+      return res.status(400).json({ success: false, message: "User does not exist" });
+    }
+
+    return res.status(200).json({ success: true, message: "User is valid", data: {
+      email: user.email,
+      fullName: user.fullName,
+      isVerified: user.isVerified,
+      avatar: user.avatar,
+      usage : user.usage,
+      subscriptionStatus: user.subscriptionStatus,
+      plan: user.plan
+    } });
+
+
+
+  }catch(error){
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+
 }

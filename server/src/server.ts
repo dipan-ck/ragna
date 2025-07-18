@@ -5,10 +5,16 @@ import authRoutes from './routes/authRoutes';
 import updateRoutes from "./routes/updateRoutes"
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import cors from 'cors';
 
 dotenv.config();
 
 const app: Application = express();
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true // if you're using cookies
+}));
 
 // Middleware
 app.use(express.json());
