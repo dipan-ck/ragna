@@ -1,0 +1,13 @@
+import express from 'express';
+import { googleAuth, loginUser, logOutUser, registerUser, resendOTP, validateUser, verifyOTP } from '../controllers/authController';
+import { authLimiter } from 'middlewares/rateLimiter';
+import verifyAuth from 'middlewares/verifyAuth';
+const router = express.Router();
+router.post('/register', authLimiter, registerUser);
+router.post('/login', authLimiter, loginUser);
+router.post("/verify-otp", authLimiter, verifyOTP);
+router.get("/logout", authLimiter, logOutUser);
+router.post("/resend-otp", authLimiter, resendOTP);
+router.post("/google", authLimiter, googleAuth);
+router.get("/me", verifyAuth, validateUser);
+export default router;
