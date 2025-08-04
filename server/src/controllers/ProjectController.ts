@@ -177,7 +177,6 @@ export async function regenerateProjectKey(req: Request, res: Response) {
         .json({ success: false, message: "Project not found" });
     }
 
-    project.apiKey = generateProjectApiKey();
     await project.save();
 
     return res

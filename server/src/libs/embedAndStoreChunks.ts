@@ -1,16 +1,21 @@
 // libs/embedAndStoreChunks.ts
-import { InferenceClient } from "@huggingface/inference";
+import { InferenceClient} from "@huggingface/inference";
 import chunkText from "./chunker";
 import { pineconeIndex } from "config/PineconeClient";
+import { PineconeRecord, RecordMetadata } from "@pinecone-database/pinecone";
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-
-
 const client = new InferenceClient(process.env.HF_TOKEN!);
 
-async function returnVectorObject(chunk: string, params: any) {
+async function returnVectorObject(chunk: string, params: {
+  namespace: string;
+  fileId: string;
+  projectId: string;
+  userId: string;
+  index: number;
+}): Promise<PineconeRecord<RecordMetadata>> {
   try {  
     const embedding = await client.featureExtraction({
       model: "sentence-transformers/all-MiniLM-L6-v2",
@@ -18,10 +23,9 @@ async function returnVectorObject(chunk: string, params: any) {
       provider: "hf-inference"
     });
 
-
     return {
       id: `chunk_${params.fileId}_${params.index}`,
-      values: embedding,
+      values: Array.from(embedding),
       metadata: {
         fileId: params.fileId,
         projectId: params.projectId,
@@ -45,9 +49,7 @@ export async function embedAndStoreChunks(
     userId,
   }: { namespace: string; fileId: string; projectId: string; userId: string }
 ) {
-
   const chunks = chunkText(rawText);
-
 
   const vectors = await Promise.all(
     chunks.map((chunk, index) =>
@@ -61,8 +63,5 @@ export async function embedAndStoreChunks(
     )
   );
 
-  
-
-   await pineconeIndex.namespace(namespace).upsert(vectors);
-  
+  await pineconeIndex.namespace(namespace).upsert(vectors);
 }

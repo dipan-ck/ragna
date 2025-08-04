@@ -12,7 +12,7 @@ export async function modelGemini2_0flash(
   project: any,
   user: any,
   projectId: string,
-  userId: string
+  userId:
 ) {
   try {
     // Vector search for knowledge base
@@ -352,7 +352,7 @@ export async function modelDeepSeekR1(
   project: any,
   user: any,
   projectId: string,
-  userId: string
+  userId
 ) {
   try {
     const client = new InferenceClient(process.env.HF_TOKEN!);

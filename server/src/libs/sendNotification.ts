@@ -2,7 +2,7 @@ import { Notification } from "../models/Notification";
 
 export const sendNotification = async (
   userId: string,
-  type: "succes" | "warning" | "info",
+  type: "success" | "warning" | "info",
   message: string
 ) => {
   try {

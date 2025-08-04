@@ -179,7 +179,7 @@ export async function deleteFile(req, res) {
  
     const project = file.projectId;
     
-    const namespace =  project.namespace;
+    const namespace = (project as any).namespace;
     if (!namespace) {
       return res.status(500).json({ success: false, message: 'Project namespace not found.' });
     }
