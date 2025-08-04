@@ -10,7 +10,7 @@ import { pineconeIndex } from "config/PineconeClient";
 
 export async function createProject(req: Request, res: Response) {
   try {
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -63,7 +63,7 @@ export async function createProject(req: Request, res: Response) {
 
 export async function getAllProjects(req: Request, res: Response) {
   try {
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
 
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -82,7 +82,7 @@ export async function getAllProjects(req: Request, res: Response) {
 
 export async function getProject(req: Request, res: Response) {
   try {
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
 
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -114,7 +114,7 @@ export async function getProject(req: Request, res: Response) {
 
 export async function tooggleStatus(req: Request, res: Response) {
   try {
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -158,7 +158,7 @@ export async function tooggleStatus(req: Request, res: Response) {
 
 export async function regenerateProjectKey(req: Request, res: Response) {
   try {
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -222,7 +222,7 @@ export async function chatWithModel(req: Request, res: Response) {
     
     switch (project.model) {
       case 'gemini-2.0-flash':
-        return await modelGemini2_0flash(message, res, project, user, projectId, userId);
+        return await modelGemini2_0flash(message, res, project, user, projectId.toString(), userId.toString());
 
         case "Kimi-K2-Instruct":
           return await modelKimiK2Instruct(message, res, project, user, projectId, userId);
@@ -245,30 +245,11 @@ export async function chatWithModel(req: Request, res: Response) {
 
 
 
-// export async function getAllChats(req: Request, res: Response){
-//     try{
 
-//         const userId = req.user?.id;
-//         const {projectId} = req.body;
-
-//         if(!userId || !projectId){
-//             return res.status(400).json({success: false, message: 'Missing required fields.' });
-//         }
-
-//         const chats = await Chat.find({ projectId, userId});
-
-//         return res.status(200).json({success: true, data: chats});
-
-//     }catch(error){
-//         console.error('Get all chats error:', error);
-//         return res.status(500).json({ success: false, message: 'Internal server error' });
-
-//     }
-// }
 
 export async function getAllChats(req: Request, res: Response) {
   try {
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
     const { projectId, limit = 20, before } = req.body;
 
     if (!userId || !projectId) {
@@ -302,7 +283,7 @@ export async function getAllChats(req: Request, res: Response) {
 export async function deleteProject(req: Request, res: Response) {
     try {
       
-      const userId  =  req.user?.id;
+      const userId = (req as any).user?.id;
       const projectId = req.params.projectId;
 
   
