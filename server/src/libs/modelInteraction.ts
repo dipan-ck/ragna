@@ -12,7 +12,7 @@ export async function modelGemini2_0flash(
   project: any,
   user: any,
   projectId: string,
-  userId:
+  userId
 ) {
   try {
     // Vector search for knowledge base
