@@ -1,4 +1,5 @@
 import multer, { FileFilterCallback } from 'multer';
+import { Request } from 'express';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from './cloudinary';
 
@@ -8,12 +9,12 @@ const storage = new CloudinaryStorage({
     folder: 'profile_images',
     allowed_formats: ['jpg', 'jpeg', 'png'],
     transformation: [{ width: 500, height: 500, crop: 'limit' }],
-  },
+  } as any,
 });
 
 // Extra security: prevent .webp or .exe upload
 const fileFilter = (
-  req: Express.Request,
+  req: Request,
   file,
   cb: FileFilterCallback
 ) => {

@@ -13,7 +13,8 @@ router.post('/send', async (req, res) => {
   }
 
   try {
-    await Feedback.create({ name, email, feedback });
+    const newFeedback = new Feedback({ name, email, feedback });
+    await newFeedback.save();
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error('Error saving feedback:', err);

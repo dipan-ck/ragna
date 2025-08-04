@@ -2,9 +2,9 @@ import { Response } from 'express';
 import { GoogleGenAI } from '@google/genai';
 import { embedText } from './embedUserMessage';
 import { pineconeIndex } from 'config/PineconeClient';
+import { InferenceClient } from '@huggingface/inference';
 import { encode } from 'gpt-tokenizer';
 import Chat from 'models/Chat';
-import { InferenceClient } from '@huggingface/inference';
 
 export async function modelGemini2_0flash(
   message: string,
@@ -12,7 +12,7 @@ export async function modelGemini2_0flash(
   project: any,
   user: any,
   projectId: string,
-  userId
+  userId: string,
 ) {
   try {
     // Vector search for knowledge base
@@ -42,9 +42,8 @@ export async function modelGemini2_0flash(
       apiKey: process.env.GEMINI_API_KEY!,
     });
 
-    // Enhanced prompt for high-quality markdown with specific formatting guidelines
     const systemPrompt = `You are to strictly follow the instructions below. DO NOT deviate from them.
-
+    
 ${project.AgentInstructions || 'You are a helpful assistant.'}
 
 CRITICAL MARKDOWN FORMATTING RULES - Follow these EXACTLY:
@@ -85,82 +84,45 @@ CRITICAL MARKDOWN FORMATTING RULES - Follow these EXACTLY:
 - Start responses with a brief overview if the topic is complex
 - Use clear paragraph breaks for readability
 - End with a summary or next steps when appropriate
-- Ensure logical flow from one section to the next
+- Ensure logical flow from one section to the next`;
 
-**Example Structure:**
-# Main Topic
-
-Brief introduction paragraph.
-
-## Key Concept 1
-
-Explanation with **important terms** in bold.
-
-### Implementation Details
-
-\`\`\`javascript
-// Well-commented code example
-const example = "formatted code";
-\`\`\`
-
-Key points:
-- First important point
-- Second important point
-
-## Key Concept 2
-
-More detailed explanation...
-
-> Important note or quote here
-
-## Summary
-
-Concluding thoughts and next steps.
-
-Make your response comprehensive, well-organized, and visually appealing when rendered as markdown. Focus on clarity, proper structure, and professional presentation.`;
-
-const contents = [
-  {
-    role: 'user',
-    parts: [
+    const contents = [
       {
-        text:
-`${project.AgentInstructions || 'You are a helpful assistant.'}
-
+        role: 'user',
+        parts: [
+          {
+            text: `${systemPrompt}
+  
 Knowledge Base Context:
 ${topChunks || 'No relevant context found.'}
-
+  
 ---
-
+  
 User Question: ${message}`
+          }
+        ]
       }
-    ]
-  }
-];
+    ];
 
-
-
-    const generationConfig = {
+    const config = {
       temperature: 0.7,
       topP: 0.8,
       topK: 40,
       maxOutputTokens: 8192,
-      tools: [{ googleSearch: {} }],
     };
 
-    // Start streaming
     const stream = await ai.models.generateContentStream({
       model: 'gemini-2.0-flash',
       contents,
-      generationConfig,
+      config,
     });
 
     let fullResponse = '';
     let chunkCount = 0;
 
     // Send initial connection confirmation
-    res.write(`data: ${JSON.stringify({ 
-      type: 'connection', 
+    res.write(`data: ${JSON.stringify({
+      type: 'connection',
       status: 'connected',
       timestamp: Date.now()
     })}\n\n`);
@@ -189,13 +151,10 @@ User Question: ${message}`
       }
     }
 
-    // Post-process the markdown for quality improvements
-    const improvedMarkdown = postProcessMarkdown(fullResponse);
-
     // Send completion signal
     const completionData = {
       type: 'complete',
-      fullContent: improvedMarkdown,
+      fullContent: fullResponse,
       totalChunks: chunkCount,
       timestamp: Date.now()
     };
@@ -204,29 +163,28 @@ User Question: ${message}`
 
     // Calculate token usage
     const messageTokens = encode(message).length;
-    const responseTokens = encode(improvedMarkdown).length;
+    const responseTokens = encode(fullResponse).length;
     const totalTokens = messageTokens + responseTokens;
 
     // Save to database
     await Promise.all([
-      Chat.create({ 
-        userId, 
-        projectId, 
-        question: message, 
-        answer: improvedMarkdown 
+      Chat.create({
+        userId,
+        projectId,
+        question: message,
+        answer: fullResponse,
       }),
       user.updateOne({ $inc: { 'usage.tokensUsed': totalTokens } }),
       project.updateOne({ $inc: { tokensUsed: totalTokens } }),
     ]);
 
     // Send final done signal
-   res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
-
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
     res.end();
 
   } catch (err) {
     console.error('Gemini streaming error:', err);
-    
+
     const errorData = {
       type: 'error',
       message: 'Sorry, I encountered an error while processing your request. Please try again.',
