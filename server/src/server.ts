@@ -3,12 +3,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express, { Application } from 'express';
 import connectMongoDB from './config/connectMongoDB.js';
-import authRoutes from './routes/authRoutes';
-import fileRoutes from "./routes/fileRoutes";
-import feedbackRoutes from "./routes/feedbackRoutes"
-import notoficationRoutes from "./routes/notificationRoutes"
-import projectRoutes from "./routes/projectRoutes"
-import updateRoutes from "./routes/updateRoutes"
+import authRoutes from './routes/authRoutes.js';
+import fileRoutes from "./routes/fileRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js"
+import notoficationRoutes from "./routes/notificationRoutes.js"
+import projectRoutes from "./routes/projectRoutes.js"
+import updateRoutes from "./routes/updateRoutes.js"
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import cors from 'cors';
