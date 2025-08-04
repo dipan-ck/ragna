@@ -20,7 +20,7 @@ export async function modelGemini2_0flash(
     const namespace = project.namespace;
 
     const queryResult = await pineconeIndex.namespace(namespace).query({
-      vector: messageVector,
+      vector: messageVector as number[],
       topK: 5,
       includeMetadata: true,
     });
@@ -256,7 +256,7 @@ export async function modelKimiK2Instruct(
     const namespace = project.namespace;
 
     const queryResult = await pineconeIndex.namespace(namespace).query({
-      vector: messageVector,
+      vector: messageVector as number[],
       topK: 5,
       includeMetadata: true,
     });
@@ -362,7 +362,7 @@ export async function modelDeepSeekR1(
     const namespace = project.namespace;
 
     const queryResult = await pineconeIndex.namespace(namespace).query({
-      vector: messageVector,
+      vector: messageVector as number[],
       topK: 5,
       includeMetadata: true,
     });

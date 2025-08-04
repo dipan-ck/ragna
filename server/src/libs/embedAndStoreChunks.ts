@@ -25,7 +25,7 @@ async function returnVectorObject(chunk: string, params: {
 
     return {
       id: `chunk_${params.fileId}_${params.index}`,
-      values: Array.from(embedding),
+      values: Array.from(embedding) as number[],
       metadata: {
         fileId: params.fileId,
         projectId: params.projectId,

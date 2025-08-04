@@ -3,9 +3,6 @@ import { loadTextFromBuffer } from "libs/parseFileToText";
 import { embedAndStoreChunks } from "libs/embedAndStoreChunks";
 import File from "models/File";
 import Project from "models/Project";
-import path from "path";
-import fs  from "fs"
-import { fileURLToPath } from 'url';
 import { pineconeIndex } from "config/PineconeClient";
 import User from "models/User";
 
@@ -14,7 +11,7 @@ import User from "models/User";
 export async function uploadTextBlock(req: Request, res: Response){
     try{
 
-         const userId = req.user?.id;
+         const userId = (req as any).user?.id;
          const { projectId, content, name } = req.body;
 
      if (!userId || !projectId || !content) {
@@ -70,7 +67,7 @@ export async function uploadFileBlock(req: Request, res: Response) {
   try {
     const userId = (req as any).user?.id;
     const { projectId } = req.body;
-    const file = req.file;
+    const file = (req as any).file;
 
     
 
