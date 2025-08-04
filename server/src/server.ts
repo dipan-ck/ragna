@@ -2,7 +2,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express, { Application } from 'express';
-import connectMongoDB from './config/connectMongoDB';
+import connectMongoDB from './config/connectMongoDB.js';
 import authRoutes from './routes/authRoutes';
 import fileRoutes from "./routes/fileRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes"
