@@ -154,8 +154,8 @@ export default function VerifyEmail() {
             <Image
               src="/logo.svg"
               alt="Ragna Logo"
-              width={120}
-              height={120}
+              width={50}
+              height={50}
               className="object-contain"
             />
           </div>
@@ -191,7 +191,7 @@ export default function VerifyEmail() {
           <p className="text-center text-sm text-white/70 mt-4">
             Didn't receive the code?{' '}
             <button
-              className={`text-[#FD4C2D] cursor-pointer hover:underline hover:text-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`text-[#2194FF] cursor-pointer hover:underline hover:text-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
               onClick={resendOTP}
               disabled={!canResend}
             >

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Poppins } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import ReactQueryProvider from "@/lib/react-query-client";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,11 +24,28 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable}`}>
       <body className={`${poppins.className}`}>
-        <Toaster position="top-center" reverseOrder={false} />
+        <Toaster
+          toastOptions={{
+            duration: 4000,
+            position: 'top-center',
+            style: {
+              background: '#0a1526',
+              color: '#2194FF',
+              padding: '8px',
+              fontSize: '14px',
+              borderRadius: '10px',
+              border: '1px solid #2194FF'
+            },
+            iconTheme: {
+              primary: '#2194FF',
+              secondary: '#0a1526'
+            }
+          }}
+        />
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
         >
-          {children}
+                 <ReactQueryProvider>{children}</ReactQueryProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

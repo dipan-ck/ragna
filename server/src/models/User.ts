@@ -7,7 +7,7 @@ export interface IUser extends Document {
   avatar : string
   isVerified: boolean;
   isOAuth: boolean;
-  plan: 'free' | 'pro' | 'team';
+  plan: 'free' | 'pro' | 'business';
   subscriptionStatus: 'active' | 'cancelled';
   stripeCustomerId?: string;
   usage: {
@@ -51,7 +51,7 @@ const userSchema: Schema<IUser> = new Schema({
   },
   plan: {
     type: String,
-    enum: ['free', 'pro', 'team'],
+    enum: ['free', 'pro', 'business'],
     default: 'free'
   },
   subscriptionStatus: {

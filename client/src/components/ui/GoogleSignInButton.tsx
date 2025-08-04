@@ -40,7 +40,7 @@ export default function GoogleSignInButton() {
   return (
     <button
       onClick={() => login()}
-      className="flex items-center justify-center gap-3 font-medium px-6 py-2 bg-white text-black rounded-lg border border-gray-300 hover:shadow-md transition duration-200 w-full"
+      className="flex items-center cursor-pointer justify-center gap-3 font-medium px-6 py-2 bg-white text-black rounded-lg border border-gray-300 hover:shadow-md transition duration-200 w-full"
     >
       <img src="/google-logo.png" alt="Google" className="w-5 h-5" />
       <span>Sign in with Google</span>

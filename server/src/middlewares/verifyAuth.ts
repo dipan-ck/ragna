@@ -5,15 +5,17 @@ export default function verifyAuth(req: Request, res: Response, next: NextFuncti
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ success: false, message: 'No token provided' });
+    // 🔒 No token — redirect to login
+    return res.redirect('/auth/login');
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    req.user = { id: decoded.id };
+    req.user = { id: (decoded as any).id };
     next();
   } catch (error) {
-    console.error("Token verification failed:", error);
-    return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    console.error('Token verification failed:', error);
+    // 🔒 Invalid or expired token — also redirect to login
+    return res.redirect('/auth/login');
   }
 }

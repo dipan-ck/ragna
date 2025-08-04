@@ -61,8 +61,8 @@ export default function VerificationPasswordReset() {
             <Image
               src="/logo.svg"
               alt="Ragna Logo"
-              width={120}
-              height={120}
+              width={50}
+              height={50}
               className="object-contain"
             />
           </div>
@@ -98,7 +98,7 @@ export default function VerificationPasswordReset() {
           <p className="text-center text-sm text-white/70 mt-4">
             Didn't receive the code?{' '}
             <button
-              className="text-[#FD4C2D] transition-colors duration-200"
+              className="text-[#2194FF] transition-colors duration-200"
               onClick={() => {/* Handle resend logic */}}
             >
               Resend

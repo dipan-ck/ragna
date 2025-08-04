@@ -35,8 +35,8 @@ export default function ResetPassword() {
             <Image
               src="/logo.svg"
               alt="Ragna Logo"
-              width={120}
-              height={120}
+              width={50}
+              height={50}
               className="object-contain"
             />
           </div>

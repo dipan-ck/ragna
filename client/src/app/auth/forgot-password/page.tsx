@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { Mail } from 'lucide-react'
 import { SubmitButton } from '@/components/ui/submitButton'
-import { InputField } from '@/components/ui/InputField'
 import Image from 'next/image'
+import { Input } from '@/components/ui/Input'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 
@@ -86,8 +86,8 @@ export default function RequestPasswordReset() {
             <Image
               src="/logo.svg"
               alt="Ragna Logo"
-              width={120}
-              height={120}
+              width={50}
+              height={50}
               className="object-contain"
             />
           </div>
@@ -97,7 +97,7 @@ export default function RequestPasswordReset() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 w-full mt-6">
-            <InputField
+            <Input
               id="email"
               name="email"
               type="email"
@@ -120,10 +120,10 @@ export default function RequestPasswordReset() {
           <p className="text-center text-sm text-white/70 mt-4">
             Remember your password?{' '}
             <a
-              href="/login"
-              className="text-[#FD4C2D] transition-colors duration-200"
+              href="/auth/login"
+              className="text-[#2194FF] transition-colors duration-200"
             >
-              Sign in
+              Login
             </a>
           </p>
         </div>
