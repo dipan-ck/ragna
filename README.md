@@ -1,4 +1,4 @@
-# 🤖 Ragna - Build intelligent AI agents powered by your own data
+# Ragna - Build intelligent AI agents powered by your own data
 
 <div align="center">
 
@@ -41,7 +41,6 @@ Ragna is an open-source platform that enables developers to create intelligent A
 - Next.js 15 with App Router
 - TypeScript
 - Tailwind CSS
-- React Hook Form
 - Zustand (State Management)
 - TanStack Query (Data Fetching)
 
@@ -142,8 +141,8 @@ I welcome contributions from the community! Here's how you can help:
 
 ### Ways to Contribute
 
-- 🐛 **Report bugs** - Found a bug? [Open an issue](https://github.com/yourusername/ragna/issues)
-- 💡 **Suggest features** - Have an idea? [Start a discussion](https://github.com/yourusername/ragna/discussions)
+- 🐛 **Report bugs** - Found a bug? Open an issue
+- 💡 **Suggest features** - Have an idea? Start a discussion
 - 📝 **Improve documentation** - Help make our docs better
 - 🔧 **Submit code** - Fix bugs or add new features
 - 🎨 **Design improvements** - Help improve the UI/UX
