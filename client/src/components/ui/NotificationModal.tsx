@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Info, CheckCircle, Bell } from 'lucide-react'; // Import more icons
 import { useNotificationUnreadCheck } from "@/lib/hooks/useNotificationUnreadCheck";
+import Loader from './Loader';
 
 // Define a type for notification
 type NotificationType = 'warning' | 'info' | 'success' | 'default';
@@ -90,8 +91,10 @@ export default function NotificationModal({
         </button>
       </div>
 
-      {loading ? (
-        <p className="text-gray-400">Loading...</p>
+      {true ? (
+        <div className="flex justify-center items-center h-40">
+          <Loader/>
+        </div>
       ) : notifications.length === 0 ? (
         <p className="text-gray-500">No notifications yet.</p>
       ) : (
