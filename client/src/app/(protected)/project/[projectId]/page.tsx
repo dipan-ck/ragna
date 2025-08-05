@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 async function getProjectData(projectId: string) {
  
     const cookieStore =  await cookies();
-  const cookieHeader = await  cookieStore.toString();
+  const cookieHeader = cookieStore.toString();
   
   const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/proxy/project/get/${projectId}`, {
     cache: 'no-store',
