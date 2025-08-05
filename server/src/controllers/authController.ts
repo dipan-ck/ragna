@@ -86,7 +86,7 @@ export async function loginUser(
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -170,7 +170,7 @@ export async function verifyOTP(req: Request, res: Response) {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -232,62 +232,7 @@ export async function resendOTP(req: Request, res: Response) {
   }
 }
 
-// export async function googleAuth(req: Request, res: Response) {
-//   const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
- 
-//     const parse = googleAuthSchema.safeParse(req.body);
-//   if (!parse.success) {
-//     return res.status(400).json({ success: false, message: "Invalid token", errors: parse.error.errors });
-//   }
 
-//   const { idToken } = parse.data;
-
-//   try {
-//     const ticket = await client.verifyIdToken({
-//       idToken,
-//       audience: process.env.GOOGLE_CLIENT_ID,
-//     });
-
-//     const payload = ticket.getPayload();
-
-//     if (!payload || !payload.email || !payload.name) {
-//       return res.status(400).json({ success: false, message: 'Invalid token' });
-//     }
-
-//     const { email, name, picture } = payload;
-
-//     let user = await User.findOne({ email });
-
-//     if (!user) {
-//       // Create user if doesn't exist
-//       user = await User.create({
-//         email,
-//         fullName: name,
-//         isVerified: true, // Google verified
-//         password: '',     // No password
-//         avatar: picture,
-//         isOAuth: true
-//       });
-//     }
-
-//     // generate your JWT token
-//     const token = generateToken(user._id.toString());
-
-//     // set cookie or send token
-//     res.cookie('token', token, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === 'production',
-//       sameSite: 'strict',
-//       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-//     });
-
-//     return res.status(200).json({ success: true, message: 'Logged in Successfully' });
-
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(401).json({ success: false, message: 'Google authentication failed' });
-//   }
-// }
 
 
 export async function googleAuth(req: Request, res: Response) {
@@ -350,7 +295,7 @@ export async function googleAuth(req: Request, res: Response) {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
