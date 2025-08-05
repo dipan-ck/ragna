@@ -88,7 +88,7 @@ function Navbar({ user, projects }) {
           <div className="relative p-1 border-[1px] rounded-full border-[#252525] bg-[#090909]">
             <div className="flex items-center gap-2 cursor-pointer" onClick={toggleDropdown}>
               <Image
-                src={data.avatar || '/default-user-avatar.svg'}
+                src={data?.avatar || '/default-user-avatar.svg'}
                 alt="User Avatar"
                 width={35}
                 height={35}

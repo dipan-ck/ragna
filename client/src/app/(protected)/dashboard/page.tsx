@@ -8,7 +8,7 @@ import CreateProjectModal from '@/components/CreateProjectModal';
 async function getUserData() {
   try {
     const cookieStore = await cookies(); // Remove await
-    const token = await cookieStore.get('token')?.value; // Remove await
+    const token =  cookieStore.get('token')?.value; // Remove await
 
     
 
@@ -41,7 +41,7 @@ async function getUserData() {
 async function getUserProjects() {
   try {
     const cookieStore = await cookies(); // Remove await
-    const token = await cookieStore.get('token')?.value;
+    const token =  cookieStore.get('token')?.value;
 
     if (!token) {
       console.log('No token found for projects');
@@ -73,7 +73,6 @@ export default async function DashboardPage() {
   const user = await getUserData();
   const projects = await getUserProjects();
 
-  console.log(user, projects);
   
 
 
