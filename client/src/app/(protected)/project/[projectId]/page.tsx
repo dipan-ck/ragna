@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import ProjectDetail from '@/components/ui/ProjectDetail';
 
 async function getProjectData(projectId: string, token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_URL}/api/proj/get/${projectId}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/project/get/${projectId}`, {
     cache: 'no-store',
     credentials: 'include',
     headers: {
@@ -12,7 +12,8 @@ async function getProjectData(projectId: string, token: string) {
   });
 
   if (!res.ok) {
-   
+    // Redirect on auth failure or project not found
+    redirect('/auth/login');
   }
 
   const result = await res.json();
