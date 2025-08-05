@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { SubmitButton } from "../ui/submitButton";
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import { User, Mail, Check, X } from "lucide-react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";

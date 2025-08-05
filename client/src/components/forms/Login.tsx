@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Mail } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { SubmitButton } from "../ui/submitButton";
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import { ErrorToast, SuccessToast } from "../ui/Toast";
 
 const Login = () => {
