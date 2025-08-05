@@ -4,12 +4,13 @@ import Projects from '../../../components/ui/Projects';
 import Navbar from '../../../components/ui/Navbar';
 import AddProjectButton from '@/components/ui/AddProjectButton';
 import CreateProjectModal from '@/components/CreateProjectModal';
-import { redirect } from 'next/navigation';
 
 async function getUserData() {
   try {
-    const cookieStore = cookies(); // Remove await
-    const token = cookieStore.get('token')?.value; // Remove await
+    const cookieStore = await cookies(); // Remove await
+    const token = await cookieStore.get('token')?.value; // Remove await
+
+    
 
     if (!token) {
       console.log('No token found');
@@ -39,8 +40,8 @@ async function getUserData() {
 
 async function getUserProjects() {
   try {
-    const cookieStore = cookies(); // Remove await
-    const token = cookieStore.get('token')?.value;
+    const cookieStore = await cookies(); // Remove await
+    const token = await cookieStore.get('token')?.value;
 
     if (!token) {
       console.log('No token found for projects');
@@ -72,10 +73,6 @@ export default async function DashboardPage() {
   const user = await getUserData();
   const projects = await getUserProjects();
 
-  // Redirect to login if no user data
-  if (!user) {
-    redirect('/login'); // or wherever your login page is
-  }
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-black w-full text-white">
