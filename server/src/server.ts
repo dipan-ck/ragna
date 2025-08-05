@@ -17,10 +17,18 @@ import cors from 'cors';
 
 const app: Application = express();
 
+const allowedOrigins = ['http://localhost:3000', 'https://your-production-frontend.com'];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true // if you're using cookies
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
 }));
+
 
 // Middleware
 app.use(express.json());
