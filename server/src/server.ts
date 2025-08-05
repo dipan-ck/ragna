@@ -19,19 +19,26 @@ const app: Application = express();
 
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.CLIENT_URL // e.g., https://ragna-ai.vercel.app
+  'https://ragna-ai.vercel.app'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    const normalizedOrigin = origin?.replace(/\/$/, ''); // Remove trailing slash
+    console.log('Normalized Origin:', normalizedOrigin);
+    if (!normalizedOrigin || allowedOrigins.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
+      console.warn('Blocked CORS origin:', normalizedOrigin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true
 }));
+
+
+app.options('*', cors()); 
+
 
 
 // Middleware
