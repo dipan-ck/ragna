@@ -91,7 +91,7 @@ export default function NotificationModal({
         </button>
       </div>
 
-      {true ? (
+      {loading ? (
         <div className="flex justify-center items-center h-40">
           <Loader/>
         </div>
