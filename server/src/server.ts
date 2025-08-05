@@ -17,16 +17,20 @@ import cors from 'cors';
 
 const app: Application = express();
 
-const allowedOrigins = ['http://localhost:3000', 'https://your-production-frontend.com'];
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.CLIENT_URL // e.g., https://ragna-ai.vercel.app
+];
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true,
+  credentials: true
 }));
 
 
