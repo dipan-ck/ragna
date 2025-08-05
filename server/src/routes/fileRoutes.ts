@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 router.post("/get", verifyAuth, getAllFiles);
-router.delete("/delete", verifyAuth, deleteFile)
+router.delete("/delete", verifyAuth, deleteFile);
 router.post('/upload/text', verifyAuth, uploadTextBlock); 
 router.post('/upload/file', verifyAuth, upload.single("file"), uploadFileBlock);
 
