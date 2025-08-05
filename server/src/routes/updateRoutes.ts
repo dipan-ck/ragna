@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import verifyAuth from '../middlewares/verifyAuth.js';
-import upload from '../libs/multer';
+import upload from '../libs/multer.js';
 import { requestEmailUpdate, requestPasswordReset, updateFullName, updateProfileImage, verifyEmailUpdate, verifyPasswordReset } from '../controllers/updateController.js';
 import { updateLimiter } from '../middlewares/rateLimiter.js';
 
