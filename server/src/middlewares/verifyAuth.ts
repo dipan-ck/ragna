@@ -1,11 +1,19 @@
+import { logOutUser } from 'controllers/authController';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export default function verifyAuth(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies.token;
+  let token = req.cookies.token;
+
+    const authHeader = req.headers.authorization;
+  if (!token && authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  }
+
+  console.log(token);
+  
 
   if (!token) {
-    // 🔒 No token — redirect to login
     return res.redirect('/auth/login');
   }
 

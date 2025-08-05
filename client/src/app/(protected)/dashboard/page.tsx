@@ -11,7 +11,7 @@ async function getUserData() {
 
   if (!token) return null;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/me`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/proxy/auth/me`, {
     headers: {
       Cookie: `token=${token}`,
     },
@@ -30,7 +30,7 @@ async function getUserProjects() {
 
   if (!token) return null;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/project/get`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/proxy/project/get`, {
     credentials: 'include',
     headers: {
       Cookie: `token=${token}`,

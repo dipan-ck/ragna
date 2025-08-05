@@ -4,15 +4,10 @@ import React, { useState } from 'react'
 import ProjectNavbar from './ProjectNavbar'
 import OverviewSection from './OverviewSection'
 import KnowledgeBaseSection from './KnowledgeBaseSection'
-import { useRouter } from 'next/navigation'
-import { ArrowBigLeft, ArrowLeft, LineChart } from 'lucide-react'
-// import ChatSection from './ChatSection'
-import EmbedProject from './EmbedProject'
 import ChatSection from '../chats/chat-section'
 
 
 export default function ProjectDetail({ data }) {
-  const router = useRouter()
   const [activeTab, setActiveTab] = useState('Chat')
   
   const handleTabChange = (tab) => {

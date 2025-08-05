@@ -1,35 +1,35 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import ProjectDetail from '@/components/ui/ProjectDetail';
 
-async function getProjectData(projectId: string, token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/project/get/${projectId}`, {
+import ProjectDetail from '@/components/ui/ProjectDetail';
+import { cookies } from 'next/headers';
+
+async function getProjectData(projectId: string) {
+ 
+    const cookieStore = cookies();
+  const cookieHeader = cookieStore.toString();
+  
+  const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/proxy/project/get/${projectId}`, {
     cache: 'no-store',
-    credentials: 'include',
     headers: {
-      Cookie: `token=${token}`,
-    },
+      'Cookie': cookieHeader, 
+    }
   });
 
-  if (!res.ok) {
-    // Redirect on auth failure or project not found
-    redirect('/auth/login');
-  }
+
 
   const result = await res.json();
+
+  if (!res.ok || !result.success || !result.data) {
+  console.log(res);
+  
+  }
+
   return result.data;
 }
 
 export default async function Page({ params }: { params: { projectId: string } }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
 
-  if (!token) {
-    // No token in cookies — block access
-    redirect('/auth/login');
-  }
 
-  const data = await getProjectData(params.projectId, token);
+  const data = await getProjectData(params.projectId);
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-black w-full">
