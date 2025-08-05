@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
-import Analytics from '../../components/ui/Analytics';
-import Projects from '../../components/ui/Projects';
-import Navbar from '../../components/ui/Navbar';
+import Analytics from '../../../components/ui/Analytics';
+import Projects from '../../../components/ui/Projects';
+import Navbar from '../../../components/ui/Navbar';
 import AddProjectButton from '@/components/ui/AddProjectButton';
 import CreateProjectModal from '@/components/CreateProjectModal';
 
