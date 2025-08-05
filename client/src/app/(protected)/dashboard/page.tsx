@@ -73,6 +73,9 @@ export default async function DashboardPage() {
   const user = await getUserData();
   const projects = await getUserProjects();
 
+  console.log(user, projects);
+  
+
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-black w-full text-white">
