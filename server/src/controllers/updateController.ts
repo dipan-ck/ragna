@@ -11,7 +11,7 @@ import {
   verifyEmailUpdateSchema,
   requestPasswordResetSchema,
   verifyPasswordResetSchema,
-} from "schemas/updateSchema"
+} from "../schemas/updateSchema.js"
 
 
 export const updateProfileImage = async (req: Request, res: Response) => {
