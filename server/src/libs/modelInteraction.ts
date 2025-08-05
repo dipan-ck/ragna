@@ -1,10 +1,10 @@
 import { Response } from 'express';
 import { GoogleGenAI } from '@google/genai';
 import { embedText } from './embedUserMessage.js';
-import { pineconeIndex } from 'config/PineconeClient.js';
+import { pineconeIndex } from '../config/PineconeClient.js';
 import { InferenceClient } from '@huggingface/inference';
 import { encode } from 'gpt-tokenizer';
-import Chat from 'models/Chat.js';
+import Chat from '../models/Chat.js';
 
 export async function modelGemini2_0flash(
   message: string,

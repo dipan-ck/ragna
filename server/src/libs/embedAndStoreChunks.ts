@@ -1,7 +1,7 @@
 // libs/embedAndStoreChunks.ts
 import { InferenceClient} from "@huggingface/inference";
 import chunkText from "./chunker.js";
-import { pineconeIndex } from "config/PineconeClient.js";
+import { pineconeIndex } from "../config/PineconeClient.js";
 import { PineconeRecord, RecordMetadata } from "@pinecone-database/pinecone";
 import dotenv from 'dotenv';
 
