@@ -13,14 +13,9 @@ export interface Message {
   timestamp: Date
 }
 
-interface ChatSectionProps {
-  project: {
-    _id: string
-    apiKey: string
-  }
-}
 
-export default function ChatSection({ project }: ChatSectionProps) {
+
+export default function ChatSection({ project }) {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 

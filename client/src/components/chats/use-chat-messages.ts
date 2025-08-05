@@ -4,10 +4,13 @@ import { useState, useCallback, useEffect } from "react"
 import { useGetChats } from "@/lib/hooks/useGetChats"
 import type { Message } from "../chat-section"
 
-export function useChatMessages(projectId: string) {
+export function useChatMessages(projectId) {
   const [messages, setMessages] = useState<Message[]>([])
   const [oldestChatDate, setOldestChatDate] = useState<string | null>(null)
   const [isLoadingOlder, setIsLoadingOlder] = useState(false)
+
+
+  
 
   // Fetch initial chats
   const { data: initialChats, isLoading } = useGetChats(projectId, undefined, 20)

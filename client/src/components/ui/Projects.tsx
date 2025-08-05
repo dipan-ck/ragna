@@ -2,26 +2,25 @@
 
 import React, { useState } from 'react';
 import { useProject } from '@/lib/hooks/useProject';
-import { Project } from '@/store/projectsStore';
 import ProjectCard from '@/components/ui/ProjectCard';
 import DeleteProjectDialog from '@/components/ui/DeleteProjectDialog';
 import { ErrorToast, SuccessToast } from './Toast';
 import { useUser } from '@/lib/hooks/useUser';
 import { useNotificationUnreadCheck } from "@/lib/hooks/useNotificationUnreadCheck";
 
-interface ProjectsProps {
-  serverProjects?: Project[];
-}
 
-const Projects: React.FC<ProjectsProps> = ({ serverProject }) => {
-  const { data: projects, isLoading, refetch} = useProject(serverProject);
+
+const Projects = ({fetchedProjects}) => {
+  const { data: projects, isLoading, refetch} = useProject(fetchedProjects);
   const {refetch : userFeatch} = useUser()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [dropdownOpenIdx, setDropdownOpenIdx] = useState<number | null>(null);
   const {refetch : notificationStatus} = useNotificationUnreadCheck();
 
-  const handleDelete = async (project: Project) => {
+  
+
+  const handleDelete = async (project) => {
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/project/delete/${project._id}`, {
       method: "DELETE",
@@ -42,7 +41,7 @@ const Projects: React.FC<ProjectsProps> = ({ serverProject }) => {
 
   };
 
-  const openDeleteDialog = (project: Project) => {
+  const openDeleteDialog = (project) => {
     setSelectedProject(project);
     setDeleteDialogOpen(true);
   };

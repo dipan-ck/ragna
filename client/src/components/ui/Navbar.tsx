@@ -10,12 +10,12 @@ import SearchModal from './SearchModal';
 import { useNotificationUnreadCheck } from '@/lib/hooks/useNotificationUnreadCheck';
 import NotificationModal from './NotificationModal';
 
-function Navbar({ user, projects }) {
+function Navbar({projects}) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
-  const { data, isLoading } = useUser(user);
+  const { data, isLoading } = useUser();
   const { data: hasUnread, isLoading: isNotifLoading } = useNotificationUnreadCheck();
 
 

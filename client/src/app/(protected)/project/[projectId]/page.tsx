@@ -1,39 +1,74 @@
+'use client';
 
+import { useEffect, useState } from 'react';
 import ProjectDetail from '@/components/ui/ProjectDetail';
-import { cookies } from 'next/headers';
+import { useRouter, useParams } from 'next/navigation';
+import Loader from '@/components/ui/Loader';
 
-async function getProjectData(projectId: string) {
- 
-    const cookieStore =  await cookies();
-  const cookieHeader = cookieStore.toString();
-  
-  const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/proxy/project/get/${projectId}`, {
-    cache: 'no-store',
-    headers: {
-      'Cookie': cookieHeader, 
-    }
-  });
-
-
-
-  const result = await res.json();
-
-  if (!res.ok || !result.success || !result.data) {
-  console.log(res);
-  
-  }
-
-  return result.data;
+interface Project {
+  _id: string;
+  name: string;
+  userId: string;
+  apiKey: string;
 }
 
-export default async function Page({ params }: { params: { projectId: string } }) {
+export default function ProjectPage() {
+  const [projectData, setProjectData] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const params = useParams();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const projectId = params?.projectId as string;
+      if (!projectId) return;
 
-  const data = await getProjectData(params.projectId);
+      try {
+        const resProject = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/project/get/${projectId}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const projectResult = await resProject.json();
+        if (!resProject.ok || !projectResult.success) {
+          console.error('Project fetch failed', projectResult.message);
+          router.push('/auth/login');
+          return;
+        }
+
+        const project = projectResult.data;
+        setProjectData(project);
+
+      } catch (error) {
+        console.error('Error:', error);
+        router.push('/auth/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params?.projectId, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <Loader />
+      </div>
+    );
+  }
+
+  if (!projectData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <p>Project not found or unauthorized.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-black w-full">
-      <ProjectDetail data={data} />
+      <ProjectDetail data={projectData}/>
+
     </div>
   );
 }

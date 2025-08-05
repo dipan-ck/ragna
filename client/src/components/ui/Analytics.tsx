@@ -27,8 +27,8 @@ type AnalyticsProps = {
 const cardStyles =
   'bg-[#0A0A0A] border border-[#2A2A2A] rounded-2xl p-4 flex flex-col justify-between transition hover:shadow-md hover:border-[#3A3A3A]';
 
-export default function Analytics({ serverUser }: AnalyticsProps) {
-  const { data: user, isLoading } = useUser(serverUser);
+export default function Analytics() {
+  const { data: user, isLoading } = useUser();
 
   if (isLoading || !user?.usage) {
     return <AnalyticsSkeleton />;

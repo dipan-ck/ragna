@@ -22,6 +22,7 @@ export default function ProjectDetail({ data }) {
         return <KnowledgeBaseSection project={data}/>
         case "Chat":
           return <ChatSection project={data}/>
+
     }
   }
 

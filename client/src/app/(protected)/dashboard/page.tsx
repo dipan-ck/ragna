@@ -1,85 +1,73 @@
-import { cookies } from 'next/headers';
-import Analytics from '../../../components/ui/Analytics';
-import Projects from '../../../components/ui/Projects';
-import Navbar from '../../../components/ui/Navbar';
+'use client';
+
+import { useEffect, useState } from 'react';
+import Analytics from '@/components/ui/Analytics';
+import Projects from '@/components/ui/Projects';
+import Navbar from '@/components/ui/Navbar';
 import AddProjectButton from '@/components/ui/AddProjectButton';
 import CreateProjectModal from '@/components/CreateProjectModal';
+import Loader from '@/components/ui/Loader';
+import { useUser } from '@/lib/hooks/useUser';
+import { useProject } from '@/lib/hooks/useProject';
 
-async function getUserData() {
-  try {
-    const cookieStore = await cookies(); // Remove await
-    const token =  cookieStore.get('token')?.value; // Remove await
 
-    
+export default function DashboardPage() {
+  const [user, setUser] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    if (!token) {
-      console.log('No token found');
-      return null;
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const [userRes, projectRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/me`, {
+            credentials: 'include',
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/project/get`, {
+            credentials: 'include',
+          }),
+        ]);
+
+        const userData = await userRes.json();
+        const projectData = await projectRes.json();
+
+        if (userData.success) {
+          setUser(userData.data);
+        } else {
+          console.error('User fetch failed', userData.message);
+        }
+
+        if (projectData.success) {
+          setProjects(projectData.data);
+        } else {
+          console.error('Project fetch failed', projectData.message);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard:', err);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/proxy/auth/me`, {
-      headers: {
-        Cookie: `token=${token}`,
-      },
-      credentials: 'include',
-      cache: 'no-store', // Add this to prevent caching issues
-    });
+    fetchDashboardData();
+  }, []);
 
-    if (!res.ok) {
-      console.log('User data fetch failed:', res.status);
-      return null;
-    }
+         useUser(user);
+       
 
-    const result = await res.json();
-    return result.success ? result.data : null;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    return null;
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-black text-white">
+        <Loader/>
+      </main>
+    );
   }
-}
-
-async function getUserProjects() {
-  try {
-    const cookieStore = await cookies(); // Remove await
-    const token =  cookieStore.get('token')?.value;
-
-    if (!token) {
-      console.log('No token found for projects');
-      return [];
-    }
-
-    const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/proxy/project/get`, {
-      credentials: 'include',
-      headers: {
-        Cookie: `token=${token}`,
-      },
-      cache: 'no-store', // Add this to prevent caching issues
-    });
-
-    if (!res.ok) {
-      console.log('Projects fetch failed:', res.status);
-      return [];
-    }
-
-    const result = await res.json();
-    return result.success ? result.data : [];
-  } catch (error) {
-    console.error('Error fetching user projects:', error);
-    return [];
-  }
-}
-
-export default async function DashboardPage() {
-  const user = await getUserData();
-  const projects = await getUserProjects();
-
-  
-
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-black w-full text-white">
-      <Navbar user={user} projects={projects} />
-      
+      <Navbar projects={projects} />
+
       <div className="flex flex-col items-center w-full text-white p-8">
         <div className="flex justify-between w-[90%] items-center mb-8">
           {/* Left: Text */}
@@ -96,9 +84,11 @@ export default async function DashboardPage() {
             <AddProjectButton />
           </div>
         </div>
-        <Analytics serverUser={user} />
-        <Projects serverProject={projects} />
+
+        <Analytics/>
+        <Projects fetchedProjects={projects}/>
       </div>
+
       <CreateProjectModal />
     </main>
   );

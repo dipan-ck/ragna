@@ -5,6 +5,7 @@ import { ArrowLeft, Pencil, Sparkles, File, FolderKanban, Upload, X, Check, Mail
 import { useUser } from '@/lib/hooks/useUser';
 import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 import { useRouter } from 'next/navigation';
+import Loader from '@/components/ui/Loader';
 
 function UserProfilePage() {
   const { data: user, isLoading, refetch } = useUser();
@@ -33,10 +34,7 @@ function UserProfilePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="flex items-center gap-3">
-          <Loader2 className="animate-spin" size={24} />
-          <span className="text-lg">Loading profile...</span>
-        </div>
+<Loader/>
       </div>
     );
   }
