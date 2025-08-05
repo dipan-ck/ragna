@@ -49,14 +49,6 @@ export default async function DashboardPage() {
   const projects = await getUserProjects();
   
 
-  if (!user) {
-    return (
-      <main className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p>User not authenticated. Redirecting...</p>
-        <meta httpEquiv="refresh" content="1; url=/auth/login" />
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-black w-full text-white">
