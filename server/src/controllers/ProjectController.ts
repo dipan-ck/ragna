@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { generateProjectApiKey } from "libs/generateProjectApiKey";
-import Project from "models/Project";
-import User from "models/User";
-import Chat from "models/Chat";
-import File from "models/File";
-import { sendNotification } from "libs/sendNotification";
-import { modelDeepSeekR1, modelGemini2_0flash, modelKimiK2Instruct } from "libs/modelInteraction";
-import { pineconeIndex } from "config/PineconeClient";
+import { generateProjectApiKey } from "libs/generateProjectApiKey.js";
+import Project from "models/Project.js";
+import User from "models/User.js";
+import Chat from "models/Chat.js";
+import File from "models/File.js";
+import { sendNotification } from "libs/sendNotification.js";
+import { modelDeepSeekR1, modelGemini2_0flash, modelKimiK2Instruct } from "libs/modelInteraction.js";
+import { pineconeIndex } from "config/PineconeClient.js";
 
 export async function createProject(req: Request, res: Response) {
   try {

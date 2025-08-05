@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import User from "../models/User";
-import OtpVerification from "../models/OtpVerification";
-import generateOTP from "../libs/generateOTP";
-import generateToken from "../libs/generateToken";
-import sendOtpEmail from "../libs/sendEmail";
+import User from "../models/User.js";
+import OtpVerification from "../models/OtpVerification.js";
+import generateOTP from "../libs/generateOTP.js";
+import generateToken from "../libs/generateToken.js";
+import sendOtpEmail from "../libs/sendEmail.js";
 import { OAuth2Client } from 'google-auth-library';
-import { registerSchema, loginSchema, otpSchema, resendOtpSchema, googleAuthSchema } from "../schemas/authSchema";
+import { registerSchema, loginSchema, otpSchema, resendOtpSchema, googleAuthSchema } from "../schemas/authSchema.js";
 
 
 export async function registerUser(req: Request,res: Response): Promise<Response> {
@@ -371,7 +371,7 @@ export async function googleAuth(req: Request, res: Response) {
 
 
 export async function validateUser(req : Request, res: Response){
-  const userId = req.user?.id;
+  const userId = (req as any).user?.id;
 
   try{
 

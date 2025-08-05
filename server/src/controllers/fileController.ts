@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { loadTextFromBuffer } from "libs/parseFileToText";
-import { embedAndStoreChunks } from "libs/embedAndStoreChunks";
-import File from "models/File";
-import Project from "models/Project";
-import { pineconeIndex } from "config/PineconeClient";
-import User from "models/User";
+import { loadTextFromBuffer } from "libs/parseFileToText.js";
+import { embedAndStoreChunks } from "libs/embedAndStoreChunks.js";
+import File from "models/File.js";
+import Project from "models/Project.js";
+import { pineconeIndex } from "config/PineconeClient.js";
+import User from "models/User.js";
 
 
 

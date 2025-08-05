@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { UpdateEmailOtp } from 'models/UpdateEmailOtp';
-import generateOTP from 'libs/generateOTP';
-import sendOtpEmail from 'libs/sendEmail';
-import User from 'models/User';
-import { UpdatePasswordOtp } from 'models/UpdatePasswordOtp';
+import { UpdateEmailOtp } from 'models/UpdateEmailOtp.js';
+import generateOTP from 'libs/generateOTP.js';
+import sendOtpEmail from 'libs/sendEmail.js';
+import User from 'models/User.js';
+import { UpdatePasswordOtp } from 'models/UpdatePasswordOtp.js';
 import bcrypt from 'bcrypt';
 import {
   updateFullNameSchema,
@@ -16,13 +16,13 @@ import {
 
 export const updateProfileImage = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id; 
+    const userId = (req as any).user?.id;
 
-    if (!req.file) {
+    if (!(req as any).file) {
       return res.status(400).json({ message: 'No image provided' });
     }
 
-    const imageUrl = req.file.path; // Cloudinary gives this URL
+    const imageUrl = (req as any).file.path; // Cloudinary gives this URL
 
     // ✅ Update image in DB
     const updatedUser = await User.findByIdAndUpdate(
@@ -51,7 +51,7 @@ export const updateProfileImage = async (req: Request, res: Response) => {
 
 export async function updateFullName(req: Request, res: Response){
 
- const userId = req.user?.id;
+const userId = (req as any).user?.id;
 
   const parse = updateFullNameSchema.safeParse(req.body);
   if (!parse.success) {
@@ -90,7 +90,7 @@ export async function updateFullName(req: Request, res: Response){
 
 
 export async function requestEmailUpdate(req: Request, res: Response): Promise<Response> {
-  if (!req.user || !req.user.id) {
+  if (!(req as any).user || !(req as any).user.id) {
     return res.status(401).json({ success: false, message: 'Unauthorized' });
   }
 
@@ -100,7 +100,7 @@ export async function requestEmailUpdate(req: Request, res: Response): Promise<R
   }
 
   const { email } = parse.data;
-  const userId = req.user.id;
+  const userId = (req as any).user?.id;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -132,7 +132,7 @@ export async function requestEmailUpdate(req: Request, res: Response): Promise<R
 
 
 export async function verifyEmailUpdate(req: Request, res: Response): Promise<Response> {
-  if (!req.user || !req.user.id) {
+  if (!(req as any).user || !(req as any).user.id) {
     return res.status(401).json({ success: false, message: 'Unauthorized' });
   }
 
@@ -142,7 +142,7 @@ export async function verifyEmailUpdate(req: Request, res: Response): Promise<Re
   }
 
   const { email, otp } = parse.data;
-  const userId = req.user.id;
+  const userId = (req as any).user?.id;
 
   try {
     const otpRecord = await UpdateEmailOtp.findOne({

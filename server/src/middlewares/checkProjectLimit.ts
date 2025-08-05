@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { PLAN_LIMITS } from 'config/Plans';
-import User from 'models/User';
+import { PLAN_LIMITS } from 'config/Plans.js';
+import User from 'models/User.js';
 
 
 
 export default async function checkProjectLimit(req: Request, res: Response, next: NextFunction) {
 
-      const userId = req.user?.id;
+      const userId = (req as any).user?.id;
 
         if (!userId) {
             return res.status(401).json({ success: false, message: 'Unauthorized' });

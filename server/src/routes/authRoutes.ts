@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
-import { googleAuth, loginUser, logOutUser, registerUser, resendOTP, validateUser, verifyOTP } from '../controllers/authController';
-import { authLimiter } from 'middlewares/rateLimiter';
-import verifyAuth from 'middlewares/verifyAuth';
+import { googleAuth, loginUser, logOutUser, registerUser, resendOTP, validateUser, verifyOTP } from '../controllers/authController.js';
+import { authLimiter } from 'middlewares/rateLimiter.js';
+import verifyAuth from 'middlewares/verifyAuth.js';
 
 const router: Router = express.Router();
 
