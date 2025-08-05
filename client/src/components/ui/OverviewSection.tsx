@@ -15,7 +15,7 @@ import { useGetProject } from "@/lib/hooks/useGetProject";
 import OverviewSectionSkeleton from "../skeleton/OverviewSkeleton";
 import { SuccessToast } from "./Toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { SubmitButton } from "./submitButton";
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import ModelSelect from "./ModelSelect";
 
 interface OverviewSectionProps {
