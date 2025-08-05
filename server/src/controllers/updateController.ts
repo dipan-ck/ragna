@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { UpdateEmailOtp } from 'models/UpdateEmailOtp.js';
-import generateOTP from 'libs/generateOTP.js';
-import sendOtpEmail from 'libs/sendEmail.js';
-import User from 'models/User.js';
-import { UpdatePasswordOtp } from 'models/UpdatePasswordOtp.js';
+import { UpdateEmailOtp } from '../models/UpdateEmailOtp.js';
+import generateOTP from '../libs/generateOTP.js';
+import sendOtpEmail from '../libs/sendEmail.js';
+import User from '../models/User.js';
+import { UpdatePasswordOtp } from '../models/UpdatePasswordOtp.js';
 import bcrypt from 'bcrypt';
 import {
   updateFullNameSchema,

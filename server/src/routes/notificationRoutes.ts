@@ -1,6 +1,6 @@
 import express from 'express';
-import { Notification } from 'models/Notification.js';
-import verifyAuth from 'middlewares/verifyAuth.js';
+import { Notification } from '../models/Notification.js';
+import verifyAuth from '../middlewares/verifyAuth.js';
 
 
 const router = express.Router();

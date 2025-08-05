@@ -1,7 +1,7 @@
-import { chatWithModel, createProject, deleteProject, getAllChats, getAllProjects, getProject, regenerateProjectKey, tooggleStatus, updateProject } from 'controllers/ProjectController.js';
+import { chatWithModel, createProject, deleteProject, getAllChats, getAllProjects, getProject, regenerateProjectKey, tooggleStatus, updateProject } from '../controllers/ProjectController.js';
 import express, { Router } from 'express';
-import checkProjectLimit from 'middlewares/checkProjectLimit.js';
-import verifyAuth from 'middlewares/verifyAuth.js';
+import checkProjectLimit from '../middlewares/checkProjectLimit.js';
+import verifyAuth from '../middlewares/verifyAuth.js';
 
 
 

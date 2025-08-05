@@ -1,7 +1,7 @@
-import { deleteFile, getAllFiles, uploadFileBlock, uploadTextBlock } from 'controllers/fileController.js';
+import { deleteFile, getAllFiles, uploadFileBlock, uploadTextBlock } from '../controllers/fileController.js';
 import express from 'express';
-import {upload} from 'libs/fileMulter.js';
-import verifyAuth from 'middlewares/verifyAuth.js';
+import {upload} from '../libs/fileMulter.js';
+import verifyAuth from '../middlewares/verifyAuth.js';
 
 
 const router = express.Router();

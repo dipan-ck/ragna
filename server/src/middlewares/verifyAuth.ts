@@ -11,7 +11,7 @@ export default function verifyAuth(req: Request, res: Response, next: NextFuncti
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    req.user = { id: (decoded as any).id };
+    (req as any).user = { id: (decoded as any).id };
     next();
   } catch (error) {
     console.error('Token verification failed:', error);

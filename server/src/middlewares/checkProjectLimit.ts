@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { PLAN_LIMITS } from 'config/Plans.js';
-import User from 'models/User.js';
+import { PLAN_LIMITS } from '../config/Plans.js';
+import User from '../models/User.js';
 
 
 
