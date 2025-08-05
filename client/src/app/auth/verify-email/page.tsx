@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { SubmitButton } from '@/components/ui/submitButton'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'

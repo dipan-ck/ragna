@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useState, useRef } from 'react'
 import { Input } from '@/components/ui/Input'
 import { TextArea } from '@/components/ui/TextArea'
-import { SubmitButton } from '@/components/ui/submitButton'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import { Mail, User, ArrowLeft } from 'lucide-react'
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast'
 

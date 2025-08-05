@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Mail } from 'lucide-react'
-import { SubmitButton } from '@/components/ui/submitButton'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import Image from 'next/image'
 import { Input } from '@/components/ui/Input'
 import { useRouter } from 'next/navigation'
