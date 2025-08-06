@@ -1,10 +1,9 @@
-// client/src/app/auth/layout.tsx
-import AuthGuard from "@/components/AuthGuard";
+import  AuthGuard  from '@/components/AuthGuard'
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <AuthGuard>{children}</AuthGuard>;
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthGuard>
+      {children}
+    </AuthGuard>
+  )
 }
