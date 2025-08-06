@@ -11,7 +11,6 @@ import Projects from '@/components/ui/Projects'
 import Navbar from '@/components/ui/Navbar'
 import AddProjectButton from '@/components/ui/AddProjectButton'
 import CreateProjectModal from '@/components/CreateProjectModal'
-import { useUser } from '@/lib/hooks/useUser'
 
 interface UserData {
   _id: string
@@ -82,7 +81,7 @@ export default async function DashboardPage() {
     if (connection.readyState === 0) await connectMongoDB()
 
     // Get token from cookie
-    const token = await cookies().get('token')?.value
+    const token =  cookies().get('token')?.value
     if (!token) throw new Error('No token found')
 
     // Parse and validate token
