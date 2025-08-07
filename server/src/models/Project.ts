@@ -48,7 +48,8 @@ const projectSchema = new Schema<IProject>({
   },
   totalFiles: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0
   },
   createdAt: {
     type: Date,

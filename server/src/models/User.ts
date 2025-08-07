@@ -64,9 +64,9 @@ const userSchema: Schema<IUser> = new Schema({
     default: ''
   },
   usage: {
-    tokensUsed: { type: Number, default: 0 },
-    filesUploaded: { type: Number, default: 0 },
-    projectsCreated: { type: Number, default: 0 }
+    tokensUsed: { type: Number, default: 0, min: 0 },
+    filesUploaded: { type: Number, default: 0, min: 0 },
+    projectsCreated: { type: Number, default: 0, min: 0 }
   },
   createdAt: {
     type: Date,

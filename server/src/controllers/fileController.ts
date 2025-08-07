@@ -39,13 +39,10 @@ export async function uploadTextBlock(req: Request, res: Response){
         userId
     })
 
-     const user  = await User.findById(userId)
-
-     user.usage.filesUploaded += 1;
-      project.totalFiles += 1;
-
-      await user.save();
-    await project.save();
+    await Promise.all([
+      User.findByIdAndUpdate(userId, { $inc: { 'usage.filesUploaded': 1 } }),
+      Project.findByIdAndUpdate(projectId, { $inc: { totalFiles: 1 } }),
+    ]);
 
 
       return res.status(201).json({
@@ -108,14 +105,10 @@ export async function uploadFileBlock(req: Request, res: Response) {
       userId,
     });
 
-    // ✅ Update usage stats
-    const user = await User.findById(userId);
-    user.usage.filesUploaded += 1;
-    project.totalFiles += 1;
-
-    await user.save();
-    await fileMeta.save();
-    await project.save();
+    await Promise.all([
+      User.findByIdAndUpdate(userId, { $inc: { 'usage.filesUploaded': 1 } }),
+      Project.findByIdAndUpdate(projectId, { $inc: { totalFiles: 1 } }),
+    ]);
 
     return res.status(201).json({
       success: true,
@@ -224,14 +217,11 @@ export async function deleteFile(req, res) {
     const projectDoc = await Project.findById(project)
 
 
-    const user = await User.findById(userId);
+    await Promise.all([
+      User.findByIdAndUpdate(userId, { $inc: { 'usage.filesUploaded': -1 } }),
+      Project.findByIdAndUpdate(project._id, { $inc: { totalFiles: -1 } }),
+    ]);
 
-    user.usage.filesUploaded -= 1;
-    projectDoc.totalFiles -= 1;
-
-
-    await projectDoc.save();
-    await user.save()
    
     const files = await File.find({ userId });
     return res.status(200).json({

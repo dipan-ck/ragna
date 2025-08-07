@@ -9,7 +9,6 @@ export function useProject(serverProject?: any[]) {
     queryKey: ['project'],
     queryFn: fetchProjects,
     initialData: serverProject,
-    staleTime: 1000 * 60 * 5, 
     retry: 1,
   });
 }
