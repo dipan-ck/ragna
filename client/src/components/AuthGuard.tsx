@@ -1,7 +1,10 @@
-"use client";
+// components/AuthGuard.tsx
+'use client';
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useQueryClient } from '@tanstack/react-query';
+import Loader from "./ui/Loader";
 
 const authPages = [
   '/auth/login',
@@ -24,6 +27,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [allowed, setAllowed] = useState(false);
+  const queryClient = useQueryClient(); // ✅ get queryClient
 
   useEffect(() => {
     let cancelled = false;
@@ -37,8 +41,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         const isLoggedIn = res.ok && data?.success;
 
-        console.log(data);
-        
+        if (!cancelled && isLoggedIn && data.data) {
+          // ✅ Inject user into React Query cache
+          queryClient.setQueryData(['user'], data.data);
+        }
 
         if (!isLoggedIn && protectedPages.some((path) => pathname.startsWith(path))) {
           router.replace('/auth/login');
@@ -66,23 +72,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [pathname, router]);
+  }, [pathname, router, queryClient]);
 
   if (!allowed) {
     return (
       <div className="w-screen h-screen flex items-center justify-center bg-black">
-
-<div className="loader">
-  <div className="square" id="sq1"></div>
-  <div className="square" id="sq2"></div>
-  <div className="square" id="sq3"></div>
-  <div className="square" id="sq4"></div>
-  <div className="square" id="sq5"></div>
-  <div className="square" id="sq6"></div>
-  <div className="square" id="sq7"></div>
-  <div className="square" id="sq8"></div>
-  <div className="square" id="sq9"></div>
-</div>
+        <Loader />
       </div>
     );
   }
