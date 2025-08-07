@@ -333,7 +333,8 @@ export async function validateUser(req : Request, res: Response){
       avatar: user.avatar,
       usage : user.usage,
       subscriptionStatus: user.subscriptionStatus,
-      plan: user.plan
+      plan: user.plan,
+      createdAt: user.createdAt
     } });
 
 

@@ -9,8 +9,6 @@ export default function verifyAuth(req: Request, res: Response, next: NextFuncti
   if (!token && authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.split(' ')[1];
   }
-
-  console.log(token);
   
 
   if (!token) {

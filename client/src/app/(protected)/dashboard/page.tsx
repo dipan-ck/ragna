@@ -64,7 +64,10 @@ export default function DashboardPage() {
 
 
   return (
-    <main className="min-h-screen flex flex-col items-center bg-black w-full text-white">
+    <main className="min-h-screen  flex flex-col items-center  w-full text-white">
+
+
+
       <Navbar projects={projects} />
       <div className="flex flex-col items-center w-full text-white p-8">
         <div className="flex justify-between w-[90%] items-center mb-8">

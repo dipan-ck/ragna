@@ -6,6 +6,8 @@ import { useUser } from '@/lib/hooks/useUser';
 import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 import { useRouter } from 'next/navigation';
 import Loader from '@/components/ui/Loader';
+import Image from 'next/image';
+
 
 function UserProfilePage() {
   const { data: user, isLoading, refetch } = useUser();
@@ -255,11 +257,13 @@ function UserProfilePage() {
             <div className="bg-[#000000] rounded-4xl border border-[#171717] p-8">
               <div className="flex items-center gap-6">
                 <div className="relative group" style={{ height: '80px', width: '80px', minHeight: '80px', minWidth: '80px' }}>
-                  <img
+                  <Image
                     src={user.avatar && user.avatar.trim() !== "" ? user.avatar : "/default-user-avatar.svg"}
                     alt="avatar"
-                    className="w-20 h-20 min-h-[80px] min-w-[80px] max-h-[80px] max-w-[80px] rounded-full border-2 border-gray-700 object-cover"
-                    style={{ height: '80px', width: '80px' }}
+                    width={80}
+                    height={80}
+                    className="rounded-full border-2 border-gray-700 object-cover"
+                    priority
                   />
                   <button
                     onClick={() => setShowImageUpload(true)}
@@ -320,11 +324,13 @@ function UserProfilePage() {
                 <div className="flex justify-between items-center py-3 border-b border-gray-800">
                   <span className="text-gray-400">Plan</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm capitalize rounded-full bg-[#2a2a2a] px-3 py-1 rounded">{user.plan}</span>
-                    <button className="flex items-center gap-2 px-4 rounded-full py-2 text-[#2194FF] border border-[#2194FF] bg-[#10101c] text-sm transition-colors">
-                      <Crown size={14} />
-                      Upgrade
-                    </button>
+        <span className="text-sm capitalize rounded-full backdrop-blur-2xl px-4 py-1.5 text-white font-semibold flex items-center gap-1 group relative overflow-hidden">
+          <div className="absolute inset-0 -z-30 bg-[radial-gradient(at_top_left,#ff4500,#ff0000,#ff00ff,#800080,#0000ff,#000033)] blur-[0px]"></div>
+          <Sparkles size={14} className="text-white relative z-10" />
+          <span className="relative z-10">{user.plan}</span>
+        </span>
+
+            
                   </div>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-800">

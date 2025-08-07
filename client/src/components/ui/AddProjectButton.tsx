@@ -9,11 +9,13 @@ function AddProjectButton() {
 
   return (
     <button
-      className="bg-white cursor-pointer text-sm text-black font-medium px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
-      onClick={openModal}
+      className="bg-white cursor-pointer relative overflow-hidden text-sm text-black font-medium px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+      onClick={openModal} 
     >
-      <LucidePlus /> {/* Add the plus icon */}
-      Add New Project
+
+        <LucidePlus /> {/* Add the plus icon */}
+        Add New Project
+
     </button>
   );
 }

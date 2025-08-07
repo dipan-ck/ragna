@@ -9,6 +9,8 @@ import NavbarSkeleton from '../skeleton/NavbarSkeleton';
 import SearchModal from './SearchModal';
 import { useNotificationUnreadCheck } from '@/lib/hooks/useNotificationUnreadCheck';
 import NotificationModal from './NotificationModal';
+import Link from 'next/link';
+import { Sparkles } from 'lucide-react';
 
 function Navbar({projects}) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -41,13 +43,32 @@ function Navbar({projects}) {
 
   return (
     <>
-      <nav className="flex justify-between items-center border-b-1 border-[#1a1a1a] py-1 w-full px-4">
+      <nav className="flex justify-between items-center border-b-1 z-20 border-[#1a1a1a] py-1 w-full px-4">
         {/* Logo */}
         <div className="text-xl font-bold">
           <Image src="/logo.svg" alt="Logo" width={35} height={35} />
         </div>
 
         <div className="flex items-center gap-6">
+
+<Link 
+  href="https://github.com/dipan-ck/ragna"
+  target="_blank"
+  className="px-[12px] py-[6px] bg-[#090909] border-[1px] rounded-full border-[#252525] text-sm hover:bg-[#000000] cursor-pointer flex items-center gap-2"
+>
+  <svg height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+  </svg>
+  GitHub
+</Link>
+
+
+{/* <div 
+  className="px-[12px] py-[6px] bg-[radial-gradient(at_top_left,#4F46E5,#7C3AED,#C026D3,#DB2777,#F59E0B)] rounded-full text-sm cursor-pointer hover:opacity-90 transition-all duration-300 flex items-center gap-2"
+>
+  <Sparkles className="w-4 h-4" />
+  {data?.plan || 'Free'}
+</div> */}
           {/* Search */}
           <div
             className="flex items-center border-[1px] rounded-xl border-[#252525] bg-[#090909] px-2 py-1 w-40 cursor-pointer"
