@@ -19,7 +19,8 @@ const app: Application = express();
 
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://ragna-ai.vercel.app'
+  'https://ragna-ai.vercel.app',
+  'https://ragna-yn3k.onrender.com'
 ];
 
 app.use(cors({
