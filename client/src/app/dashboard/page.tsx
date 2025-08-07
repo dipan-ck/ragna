@@ -81,7 +81,7 @@ export default async function DashboardPage() {
     if (connection.readyState === 0) await connectMongoDB()
 
     // Get token from cookie
-    const token =  cookies().get('token')?.value
+    const token = await cookies().get('token')?.value
     if (!token) throw new Error('No token found')
 
     // Parse and validate token
