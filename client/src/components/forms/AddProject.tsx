@@ -10,7 +10,8 @@ import { SuccessToast, ErrorToast } from "../ui/Toast";
 import { useNotificationUnreadCheck } from "@/lib/hooks/useNotificationUnreadCheck";
 
 const modelOptions = [
-  { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash", disabled: false },
+    { label: "DeepSeek-v3", value: "deepSeek-v3", disabled: false },
+  { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash", disabled: true },
   { label: "Kimi-K2-Instruct", value: "Kimi-K2-Instruct", disabled: true },
   { label: "DeepSeek-R1", value: "deepSeek-r1", disabled: true },
   { label: "GPT-4 (Coming soon)", value: "gpt-4", disabled: true },
@@ -22,7 +23,7 @@ const AddProject: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
     projectName: "",
     AgentInstructions: "",
   });
-  const [selectedModel, setSelectedModel] = useState("gemini-2.5-flash");
+  const [selectedModel, setSelectedModel] = useState("deepSeek-v3");
   const [isLoading, setIsLoading] = useState(false);
   const { refetch: refetchUser } = useUser();
   const { refetch: refetchProject } = useProject();

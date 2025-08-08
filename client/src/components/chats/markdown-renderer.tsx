@@ -17,21 +17,48 @@ export const MarkdownRenderer = memo(({ content }: MarkdownRendererProps) => {
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
         components={{
-          code: ({ inline, className, children }) => {
-            const match = /language-(\w+)/.exec(className || "");
-            const language = match?.[1] || "text";
-            const code = String(children).replace(/\n$/, "");
 
-            if (inline) {
-              return (
-                <code className="bg-neutral-800/70 text-blue-300 rounded-md px-2 py-0.5 text-xs font-mono hover:bg-neutral-800/90 transition-colors">
-                  {children}
-                </code>
-              );
-            }
+code: ({ inline, className, children }) => {
+  const match = /language-(\w+)/.exec(className || "");
+  const language = match?.[1] || "text";
+  const code = String(children).replace(/\n$/, "");
 
-            return <CodeBlock language={language} code={code} />;
-          },
+  if (inline) {
+    // Inline code: keep inline with paragraph text
+    return (
+      <code className="bg-neutral-800/70 text-blue-300 rounded-md px-1 py-0.5 text-xs font-mono hover:bg-neutral-800/90 transition-colors">
+        {children}
+      </code>
+    );
+  }
+
+  if (language.toLowerCase() === "text") {
+    const isMultiline = code.includes("\n");
+
+    if (isMultiline) {
+      // multiline text block = block element is okay
+      return (
+        <pre
+          className="bg-[#003cff0c] text-[#009dff] border-[1px] border-[#009dff55] rounded-md px-2 py-0.5 text-sm "
+        >
+          {code}
+        </pre>
+      );
+    } else {
+      // single-line text: render inline styled code, not block
+      return (
+        <code className="bg-[#003cff0c] text-[#009dff] border-[1px] border-[#009dff55] rounded-md px-2 py-0.5 text-sm ">
+          {code}
+        </code>
+      );
+    }
+  }
+
+  // For all other code blocks use your full CodeBlock component
+  return <CodeBlock language={language} code={code} />;
+},
+
+
 
           h1: ({ children }) => (
             <h1 className="text-2xl font-bold text-white mt-8 mb-4 pb-3 border-b border-neutral-700/50 tracking-tight">

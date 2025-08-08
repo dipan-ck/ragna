@@ -3,7 +3,7 @@ import mongoose, { Schema, model } from 'mongoose';
 export interface IProject {
   userId: mongoose.Types.ObjectId;
   name: string;
-  model: 'gpt-3.5-turbo' | 'gpt-4' | 'gemini-2.0-flash' | 'Kimi-K2-Instruct' | 'deepSeek-r1';
+  model: 'gpt-3.5-turbo' | 'gpt-4' | 'gemini-2.0-flash' | 'Kimi-K2-Instruct' | 'deepSeek-v3';
   AgentInstructions?: string;
   tokensUsed: number;
   status: 'active' | 'inactive';
@@ -25,7 +25,7 @@ const projectSchema = new Schema<IProject>({
   },
   model: {
     type: String,
-    enum: ['gpt-3.5-turbo', 'gpt-4', 'gemini-2.0-flash', 'Kimi-K2-Instruct', 'deepSeek-r1'],
+    enum: ['gpt-3.5-turbo', 'gpt-4', 'gemini-2.0-flash', 'Kimi-K2-Instruct', 'deepSeek-v3'],
     required: true
   },
   AgentInstructions: {

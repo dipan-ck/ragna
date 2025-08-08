@@ -5,7 +5,7 @@ import User from "../models/User.js";
 import Chat from "../models/Chat.js";
 import File from "../models/File.js";
 import { sendNotification } from "../libs/sendNotification.js";
-import { modelDeepSeekR1, modelGemini2_0flash, modelKimiK2Instruct } from "../libs/modelInteraction.js";
+import { modelDeepSeekR1, modelDeepSeekV3, modelGemini2_0flash, modelKimiK2Instruct } from "../libs/modelInteraction.js";
 import { pineconeIndex } from "../config/PineconeClient.js";
 
 export async function createProject(req: Request, res: Response) {
@@ -227,8 +227,8 @@ export async function chatWithModel(req: Request, res: Response) {
         case "Kimi-K2-Instruct":
           return await modelKimiK2Instruct(message, res, project, user, projectId, userId);
 
-          case "deepSeek-r1" :
-            return await modelDeepSeekR1(message, res, project, user, projectId, userId);
+          case "deepSeek-v3" :
+            return await modelDeepSeekV3(message, res, project, user, projectId, userId);
 
 
       default:
