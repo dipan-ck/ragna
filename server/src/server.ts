@@ -17,24 +17,8 @@ import cors from 'cors';
 
 const app: Application = express();
 
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://ragna-ai.vercel.app',
-  'https://ragna-yn3k.onrender.com'
-];
+app.use(cors())
 
-app.use(cors({
-  origin: function (origin, callback) {
-    console.log('Origin:', origin);
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn('Blocked CORS origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
 
 
 
@@ -45,7 +29,6 @@ app.use(express.json());
 app.use(cookieParser()); 
 app.use(helmet());
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use("/api/user", updateRoutes);
 app.use("/api/project", projectRoutes);
