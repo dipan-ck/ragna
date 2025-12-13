@@ -5,7 +5,7 @@ import User from "../models/User.js";
 import Chat from "../models/Chat.js";
 import File from "../models/File.js";
 import { sendNotification } from "../libs/sendNotification.js";
-import { modelDeepSeekR1, modelDeepSeekV3, modelGemini2_0flash, modelKimiK2Instruct } from "../libs/modelInteraction.js";
+import { modelDeepSeekR1, modelDeepSeekV3, modelGemini2_0flash, modelKimiK2Instruct, modelGroqGPT } from "../libs/modelInteraction.js";
 import { pineconeIndex } from "../config/PineconeClient.js";
 
 export async function createProject(req: Request, res: Response) {
@@ -219,21 +219,9 @@ export async function chatWithModel(req: Request, res: Response) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    
-    switch (project.model) {
-      case 'gemini-2.0-flash':
-        return await modelGemini2_0flash(message, res, project, user, projectId.toString(), userId.toString());
-
-        case "Kimi-K2-Instruct":
-          return await modelKimiK2Instruct(message, res, project, user, projectId, userId);
-
-          case "deepSeek-v3" :
-            return await modelDeepSeekV3(message, res, project, user, projectId, userId);
-
-
-      default:
-        return res.status(400).json({ success: false, message: `Unsupported model: ${project.model}` });
-    }
+    // Currently using Groq GPT (openai/gpt-oss-120b) as the default model
+    // All chat requests will use Groq GPT regardless of project.model setting
+    return await modelGroqGPT(message, res, project, user, projectId.toString(), userId.toString());
 
   } catch (err) {
     console.error('chatWithModel error:', err);

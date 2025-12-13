@@ -13,11 +13,12 @@ interface ChatContainerProps {
   onLoadOlder: () => void
   showScrollButton: boolean
   onScrollToBottom: () => void
+  hasMore?: boolean
 }
 
 export const ChatContainer = memo(
   forwardRef<HTMLDivElement, ChatContainerProps>(
-    ({ messages, isLoading, isLoadingOlder, onLoadOlder, showScrollButton, onScrollToBottom }, ref) => {
+    ({ messages, isLoading, isLoadingOlder, onLoadOlder, showScrollButton, onScrollToBottom, hasMore = true }, ref) => {
       return (
         <div className="flex-1 relative">
           <div
@@ -29,7 +30,7 @@ export const ChatContainer = memo(
             }}
           >
             {/* Load older messages button */}
-            {messages.length > 0 && (
+            {messages.length > 0 && hasMore && (
               <div className="flex justify-center mb-6">
                 <button
                   onClick={onLoadOlder}

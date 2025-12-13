@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
- "build": "tsc",
-"start": "node dist/server.js"
+    "dev": "bun --watch src/server.ts",
+    "build": "bun build src/server.ts --outdir dist --target node",
+    "start": "bun dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +28,7 @@
     "express-rate-limit": "^8.0.1",
     "google-auth-library": "^10.1.0",
     "gpt-tokenizer": "^3.0.1",
+    "groq-sdk": "^0.37.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.3.30",

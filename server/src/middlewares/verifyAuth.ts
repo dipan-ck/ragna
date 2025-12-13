@@ -1,18 +1,17 @@
-import { logOutUser } from 'controllers/authController';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export default function verifyAuth(req: Request, res: Response, next: NextFunction) {
   let token = req.cookies.token;
 
-    const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization;
   if (!token && authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.split(' ')[1];
   }
   
 
   if (!token) {
-    return res.redirect('/auth/login');
+    return res.status(401).json({ success: false, message: 'Unauthorized: No token provided' });
   }
 
   try {
@@ -21,7 +20,6 @@ export default function verifyAuth(req: Request, res: Response, next: NextFuncti
     next();
   } catch (error) {
     console.error('Token verification failed:', error);
-    // 🔒 Invalid or expired token — also redirect to login
-    return res.redirect('/auth/login');
+    return res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
   }
 }

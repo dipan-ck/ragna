@@ -10,12 +10,14 @@ import { SuccessToast, ErrorToast } from "../ui/Toast";
 import { useNotificationUnreadCheck } from "@/lib/hooks/useNotificationUnreadCheck";
 
 const modelOptions = [
-    { label: "DeepSeek-v3", value: "deepSeek-v3", disabled: false },
-  { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash", disabled: true },
-  { label: "Kimi-K2-Instruct", value: "Kimi-K2-Instruct", disabled: true },
-  { label: "DeepSeek-R1", value: "deepSeek-r1", disabled: true },
-  { label: "GPT-4 (Coming soon)", value: "gpt-4", disabled: true },
-  { label: "GPT-3.5 (Coming soon)", value: "gpt-3.5", disabled: true },
+ { label: "Groq GPT (GPT-OSS-120B)", value: "groq-gpt-oss-120b", disabled: false },
+    { label: "Gemini 2.0 Flash (Coming soon)", value: "gemini-2.0-flash", disabled: true },
+    { label: "DeepSeek-v3 (Coming soon)", value: "deepSeek-v3", disabled: true },
+    { label: "Kimi-K2-Instruct (Coming soon)", value: "Kimi-K2-Instruct", disabled: true },
+    { label: "DeepSeek-R1 (Coming soon)", value: "deepSeek-r1", disabled: true },
+    { label: "GPT-4 (Coming soon)", value: "gpt-4", disabled: true },
+    { label: "GPT-3.5 Turbo (Coming soon)", value: "gpt-3.5-turbo", disabled: true },
+    { label: "Claude 3 Opus (Coming soon)", value: "claude-3-opus", disabled: true },
 ];
 
 const AddProject: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
@@ -23,7 +25,7 @@ const AddProject: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
     projectName: "",
     AgentInstructions: "",
   });
-  const [selectedModel, setSelectedModel] = useState("deepSeek-v3");
+  const [selectedModel, setSelectedModel] = useState("groq-gpt-oss-120b");
   const [isLoading, setIsLoading] = useState(false);
   const { refetch: refetchUser } = useUser();
   const { refetch: refetchProject } = useProject();

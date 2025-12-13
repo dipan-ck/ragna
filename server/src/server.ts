@@ -17,10 +17,7 @@ import cors from 'cors';
 
 const app: Application = express();
 
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:3000',
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 
 app.use(cors({
   origin: function (origin, callback) {

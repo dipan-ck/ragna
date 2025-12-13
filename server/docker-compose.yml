@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ragna-server
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+volumes:
+  uploads:
+    driver: local
+
+networks:
+  ragna-network:
+    driver: bridge

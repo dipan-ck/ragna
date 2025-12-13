@@ -5,6 +5,236 @@ import { pineconeIndex } from "../config/PineconeClient.js";
 import { InferenceClient } from "@huggingface/inference";
 import { encode } from "gpt-tokenizer";
 import Chat from "../models/Chat.js";
+import Groq from "groq-sdk";
+
+export async function modelGroqGPT(
+  message: string,
+  res: Response,
+  project: any,
+  user: any,
+  projectId: string,
+  userId: string
+) {
+  // Track if response has been sent to prevent multiple responses
+  let responseSent = false;
+  
+  // Set up connection timeout (30 seconds)
+  const connectionTimeout = setTimeout(() => {
+    if (!responseSent) {
+      responseSent = true;
+      const timeoutData = {
+        type: "error",
+        message: "Request timeout. Please try again.",
+        timestamp: Date.now(),
+      };
+      res.write(`data: ${JSON.stringify(timeoutData)}\n\n`);
+      res.end();
+    }
+  }, 30000);
+
+  // Handle client disconnect
+  const onClose = () => {
+    clearTimeout(connectionTimeout);
+    if (!responseSent) {
+      console.log('Client disconnected during streaming');
+      responseSent = true;
+    }
+  };
+
+  res.on('close', onClose);
+  res.on('finish', onClose);
+
+  try {
+    // Vector search for knowledge base
+    const messageVector = await embedText(message);
+    const namespace = project.namespace;
+
+    const queryResult = await pineconeIndex.namespace(namespace).query({
+      vector: messageVector as number[],
+      topK: 5,
+      includeMetadata: true,
+    });
+
+    const topChunks =
+      queryResult.matches
+        ?.map((match: any) => match.metadata?.content)
+        .join("\n\n") || "";
+
+    // Set up streaming headers
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no"); // Disable nginx buffering
+    res.flushHeaders();
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API!,
+    });
+
+    const systemPrompt = `You are to strictly follow the instructions below. DO NOT deviate from them.
+    
+${project.AgentInstructions || "You are a helpful assistant."}
+
+CRITICAL MARKDOWN FORMATTING RULES - Follow these EXACTLY:
+
+**Structure & Hierarchy:**
+- Use # for main titles, ## for major sections, ### for subsections
+- Use clear, descriptive headers that outline your response structure
+- Use both ordered and unordered list items
+
+**Code Formatting:**
+- ALWAYS specify the language for code blocks: \`\`\`javascript\n...\n\`\`\`
+- Use \`inline code\` for variables, functions, and short technical terms
+- For multi-line code, always use fenced code blocks with language specification
+- Add descriptive comments in code when helpful
+
+**Lists & Organization:**
+- Use - for unordered lists (not * or +)
+- Use 1. 2. 3. for ordered lists
+- Add blank lines before and after list blocks
+- Keep list items concise but complete
+
+**Emphasis & Styling:**
+- Use **bold** for important terms and key concepts
+- Use *italics* for emphasis and definitions
+- Use > for blockquotes when citing or highlighting important information
+- Use --- for horizontal rules to separate major sections
+
+**Tables & Data:**
+- Use proper markdown tables with | separators
+- Include header rows with alignment indicators
+- Keep table content concise and well-aligned
+
+**Links & References:**
+- Use [descriptive text](url) format for links
+- Make link text meaningful and descriptive
+
+**Best Practices:**
+- Start responses with a brief overview if the topic is complex
+- Use clear paragraph breaks for readability
+- End with a summary or next steps when appropriate
+- Ensure logical flow from one section to the next
+
+---
+Knowledge Base Context:
+${topChunks || "No relevant context found."}\n---`;
+
+
+
+
+    const messages = [
+      {
+        role: "system" as const,
+        content: systemPrompt,
+      },
+      {
+        role: "user" as const,
+        content: message,
+      },
+    ];
+
+    let fullResponse = "";
+    let chunkCount = 0;
+
+    // Send initial connection confirmation
+    res.write(
+      `data: ${JSON.stringify({
+        type: "connection",
+        status: "connected",
+        timestamp: Date.now(),
+      })}\n\n`
+    );
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages,
+      model: "openai/gpt-oss-120b",
+      temperature: 1,
+      max_completion_tokens: 8192,
+      top_p: 1,
+      stream: true,
+    });
+
+    // Process stream chunks
+    for await (const chunk of chatCompletion) {
+      // Check if client disconnected
+      if (responseSent) {
+        console.log('Stopping stream - client disconnected');
+        break;
+      }
+
+      const chunkText = chunk.choices[0]?.delta?.content || "";
+      if (chunkText) {
+        fullResponse += chunkText;
+        chunkCount++;
+
+        // Send chunk to frontend
+        const chunkData = {
+          type: "chunk",
+          content: chunkText,
+          chunkIndex: chunkCount,
+          timestamp: Date.now(),
+        };
+
+        res.write(`data: ${JSON.stringify(chunkData)}\n\n`);
+      }
+    }
+
+    // Only send completion if response wasn't already sent
+    if (!responseSent) {
+      clearTimeout(connectionTimeout);
+      
+      // Send completion signal
+      const completionData = {
+        type: "complete",
+        fullContent: fullResponse,
+        totalChunks: chunkCount,
+        timestamp: Date.now(),
+      };
+
+      res.write(`data: ${JSON.stringify(completionData)}\n\n`);
+
+      // Calculate token usage
+      const messageTokens = encode(message).length;
+      const responseTokens = encode(fullResponse).length;
+      const totalTokens = messageTokens + responseTokens;
+
+      // Save to database
+      await Promise.all([
+        Chat.create({
+          userId,
+          projectId,
+          question: message,
+          answer: fullResponse,
+        }),
+        user.updateOne({ $inc: { "usage.tokensUsed": totalTokens } }),
+        project.updateOne({ $inc: { tokensUsed: totalTokens } }),
+      ]);
+
+      // Send final done signal
+      res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+      responseSent = true;
+      res.end();
+    }
+  } catch (err) {
+    console.error("Groq GPT streaming error:", err);
+    clearTimeout(connectionTimeout);
+
+    if (!responseSent) {
+      const errorData = {
+        type: "error",
+        message: err instanceof Error && err.message.includes('rate limit') 
+          ? "Rate limit reached. Please try again in a moment."
+          : "Sorry, I encountered an error while processing your request. Please try again.",
+        timestamp: Date.now(),
+      };
+
+      res.write(`data: ${JSON.stringify(errorData)}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+      responseSent = true;
+      res.end();
+    }
+  }
+}
 
 export async function modelDeepSeekV3(
   message: string,
@@ -42,9 +272,15 @@ export async function modelDeepSeekV3(
 const systemPrompt = `
 ${project.AgentInstructions || "You are a friendly, helpful AI assistant."}
 Always respond in a warm, engaging tone while still being accurate and clear.
-Use the provided knowledge base context when it is relevant, but if the question 
-is unrelated or no relevant context is found, still provide a thoughtful, 
-helpful answer using your general knowledge.
+
+## CRITICAL KNOWLEDGE BASE RULES - HIGHEST PRIORITY
+1. **ALWAYS prioritize the Knowledge Base Context below over your general knowledge**
+2. If the Knowledge Base Context contains relevant information, you MUST use it as your primary and preferred source
+3. **NEVER contradict or override Knowledge Base information with your general knowledge**
+4. Only use general knowledge when the Knowledge Base Context is empty or doesn't contain relevant information
+5. When the user's question relates to content in the Knowledge Base, base your answer ENTIRELY on that content
+6. The Knowledge Base Context is the authoritative source - trust it over everything else
+7. If the Knowledge Base has the answer, use ONLY that - do not add information from your training data
 
 ## CRITICAL THINKING RULES
 1. Always use the retrieved "Knowledge Base Context" first — only use general knowledge if context is missing or incomplete.
@@ -224,6 +460,17 @@ export async function modelGemini2_0flash(
     const systemPrompt = `You are to strictly follow the instructions below. DO NOT deviate from them.
     
 ${project.AgentInstructions || "You are a helpful assistant."}
+
+**CRITICAL KNOWLEDGE BASE RULES - HIGHEST PRIORITY:**
+1. **ALWAYS prioritize the Knowledge Base Context below over your general knowledge**
+2. If the Knowledge Base Context contains information relevant to the user's question, you MUST use that information as your primary source
+3. **NEVER contradict or override information from the Knowledge Base Context with your general knowledge**
+4. If the Knowledge Base Context has relevant content, base your ENTIRE answer on it
+5. Only use your general knowledge when:
+   - The Knowledge Base Context is empty ("No relevant context found")
+   - The Knowledge Base Context does not contain information relevant to the user's question
+6. The Knowledge Base is the authoritative source of truth - always trust it over your training data
+7. When answering from the Knowledge Base, you can improve formatting and add examples, but core facts MUST be from the Knowledge Base
 
 CRITICAL MARKDOWN FORMATTING RULES - Follow these EXACTLY:
 
@@ -412,6 +659,12 @@ export async function modelKimiK2Instruct(
         role: "user",
         content: `${agentInstructions}
 
+**CRITICAL: KNOWLEDGE BASE PRIORITY**
+You MUST prioritize the Knowledge Base Context below over your general knowledge.
+If the Knowledge Base contains relevant information, use ONLY that information.
+Never contradict the Knowledge Base with your training data.
+Only use general knowledge if the Knowledge Base is empty or doesn't have relevant content.
+
 ${topChunks ? `Knowledge Base Context:\n${topChunks}\n---\n` : ""}User Question: ${message}`,
       },
     ];
@@ -517,7 +770,7 @@ export async function modelDeepSeekR1(
     const messages = [
       {
         role: "user",
-        content: `${agentInstructions}\n\n${topChunks ? `Knowledge Base Context:\n${topChunks}\n---\n` : ""}User Question: ${message}`,
+        content: `${agentInstructions}\n\n**CRITICAL: KNOWLEDGE BASE PRIORITY**\nYou MUST prioritize the Knowledge Base Context below over your general knowledge.\nIf the Knowledge Base contains relevant information, use ONLY that information.\nNever contradict the Knowledge Base with your training data.\nOnly use general knowledge if the Knowledge Base is empty or doesn't have relevant content.\n\n${topChunks ? `Knowledge Base Context:\n${topChunks}\n---\n` : ""}User Question: ${message}`,
       },
     ];
 

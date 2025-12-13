@@ -26,7 +26,7 @@ interface ProjectData {
 export default function DashboardPage() {
   const [projects, setProjects] = useState<ProjectData[]>([])
   const [loading, setLoading] = useState(true)
-  const {data: user} = useUser()
+  const {data: user, isLoading: userLoading, error: userError} = useUser()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,10 +53,18 @@ export default function DashboardPage() {
 
 
 
-  if(loading){
+  if(loading || userLoading){
     return (
       <div className="min-h-screen flex flex-col items-center bg-black w-full text-white">
         <Loader/>
+      </div>
+    )
+  }
+
+  if(userError || !user){
+    return (
+      <div className="min-h-screen flex flex-col items-center bg-black w-full text-white">
+        <p className="text-red-500">Error loading user data</p>
       </div>
     )
   }
@@ -72,7 +80,7 @@ export default function DashboardPage() {
       <div className="flex flex-col items-center w-full text-white p-8">
         <div className="flex justify-between w-[90%] items-center mb-8">
           <div className="text-left">
-            <h1 className="text-2xl tracking-tight font-medium">Hello, {user.fullName}</h1>
+            <h1 className="text-2xl tracking-tight font-medium">Hello, {user?.fullName || 'User'}</h1>
             <p className="text-gray-400 text-xs mt-2">Manage your AI, vector databases and files.</p>
           </div>
           <div className="flex items-center gap-4">

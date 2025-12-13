@@ -8,7 +8,9 @@ export function useGetChats(projectId: string, before?: string, limit = 20) {
   return useQuery({
     queryKey: ['chats', projectId, before],
     queryFn: () => getChats(projectId, before, limit),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    cacheTime: 0,
     retry: 1,
+    enabled: !!projectId, // Only run if projectId exists
   });
 }

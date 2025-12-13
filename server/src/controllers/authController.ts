@@ -86,7 +86,7 @@ export async function loginUser(
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -108,7 +108,7 @@ export async function logOutUser(
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     return res.status(200).json({
@@ -170,7 +170,7 @@ export async function verifyOTP(req: Request, res: Response) {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -295,7 +295,7 @@ export async function googleAuth(req: Request, res: Response) {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
