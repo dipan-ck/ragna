@@ -64,3 +64,14 @@ export async function retriggerEmbedding(
         return void res.status(400).json({ error: "File is already ready" });
     res.json({ success: true });
 }
+export async function deleteFile(
+    req: Request<{ fileId: string }>,
+    res: Response,
+) {
+    const result = await fileService.deleteFile(
+        req.params.fileId,
+        req.user!.id,
+    );
+    if (!result) return void res.status(404).json({ error: "File not found" });
+    res.json({ message: "File deleted" });
+}

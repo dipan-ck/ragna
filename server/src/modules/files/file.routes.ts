@@ -8,7 +8,7 @@ router.get("/project/:projectId", requireAuth, fileController.getProjectFiles);
 router.get("/:fileId", requireAuth, fileController.getFile);
 router.post("/:fileId/reembed", requireAuth, fileController.retriggerEmbedding);
 router.post("/upload-url", requireAuth, fileController.getUploadUrl);
-
+router.delete("/:fileId", requireAuth, fileController.deleteFile);
 router.post("/confirm-upload", requireAuth, fileController.confirmUpload);
 
 export default router;

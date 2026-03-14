@@ -19,4 +19,7 @@ export const env = {
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID!,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY!,
     AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME!,
+    PINECONE_API_KEY: process.env.PINECONE_API_KEY!,
+    PINECONE_INDEX: process.env.PINECONE_INDEX!,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY!,
 };

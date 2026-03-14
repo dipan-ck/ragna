@@ -1,10 +1,12 @@
 import { prisma } from "../../config/prisma.js";
 import { s3 } from "../../lib/s3.js";
 import { env } from "../../config/env.js";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { embeddingQueue } from "../../queues/embedding.queue.js";
 import crypto from "crypto";
+import { getPineconeIndex } from "../../lib/pinecone.js";
+import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 
 export async function createUploadUrl({
     projectId,
@@ -121,7 +123,6 @@ export async function deleteProjectFiles(projectId: string) {
     });
 
     if (files.length > 0) {
-        const { DeleteObjectsCommand } = await import("@aws-sdk/client-s3");
         await s3.send(
             new DeleteObjectsCommand({
                 Bucket: env.AWS_BUCKET_NAME,
@@ -129,4 +130,41 @@ export async function deleteProjectFiles(projectId: string) {
             }),
         );
     }
+
+    const index = getPineconeIndex().namespace(projectId);
+    await index.deleteAll();
+}
+export async function deleteFile(fileId: string, userId: string) {
+    const file = await prisma.file.findFirst({
+        where: { id: fileId, project: { userId } },
+    });
+    if (!file) return null;
+
+    // delete from S3
+    await s3.send(
+        new DeleteObjectCommand({
+            Bucket: env.AWS_BUCKET_NAME,
+            Key: file.s3Key,
+        }),
+    );
+
+    const index = getPineconeIndex().namespace(file.projectId);
+    await index.deleteMany({ filter: { fileId: { $eq: fileId } } });
+
+    await prisma.file.delete({ where: { id: fileId } });
+
+    return true;
+}
+
+export async function downloadFileFromS3(s3Key: string): Promise<Buffer> {
+    const command = new GetObjectCommand({
+        Bucket: env.AWS_BUCKET_NAME,
+        Key: s3Key,
+    });
+    const response = await s3.send(command);
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+        chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
 }
