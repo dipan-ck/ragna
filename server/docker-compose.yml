@@ -1,0 +1,32 @@
+# docker-compose.yml
+services:
+    postgres:
+        image: postgres:16
+        container_name: postgres-dev
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB:-ragna}
+            POSTGRES_USER: ${POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+        ports:
+            - "${POSTGRES_PORT:-5432}:5432"
+        restart: unless-stopped
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ragna}",
+                ]
+            interval: 5s
+            retries: 5
+
+    redis:
+        image: redis:alpine
+        container_name: redis-dev
+        ports:
+            - "${REDIS_PORT:-6379}:6379"
+        restart: unless-stopped
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+# docker compose up -d

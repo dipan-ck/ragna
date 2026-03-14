@@ -3,7 +3,8 @@ import * as projectController from "./project.controller.js";
 import { requireAuth } from "../../middlewares/auth.middleware.js";
 
 const router = Router();
-
+// router
+router.get("/:id", requireAuth, projectController.getProject);
 router.get("/get-all", requireAuth, projectController.getAllProjects);
 
 router.post("/create", requireAuth, projectController.createProject);

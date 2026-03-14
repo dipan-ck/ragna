@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Request, Response } from "express";
 import * as projectService from "./project.service.js";
+import * as fileService from "../files/file.service.js";
 import {
     createProjectSchema,
     updateTitleSchema,
@@ -14,6 +15,16 @@ type ProjectParams = {
 export async function getAllProjects(req: Request, res: Response) {
     const projects = await projectService.getAllProjects(req.user!.id);
     res.json(projects);
+}
+
+export async function getProject(req: Request<ProjectParams>, res: Response) {
+    const project = await projectService.findProject(
+        req.params.id,
+        req.user!.id,
+    );
+    if (!project)
+        return void res.status(404).json({ error: "Project not found" });
+    res.json(project);
 }
 
 export async function createProject(req: Request, res: Response) {
@@ -83,6 +94,8 @@ export async function deleteProject(
     if (!exists)
         return void res.status(404).json({ error: "Project not found" });
 
+    await fileService.deleteProjectFiles(req.params.id);
     await projectService.deleteProject(req.params.id);
+
     res.json({ message: "Project deleted" });
 }

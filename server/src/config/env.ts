@@ -13,4 +13,10 @@ export const env = {
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET!,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!,
+    REDIS_HOST: process.env.REDIS_HOST!,
+    REDIS_PORT: Number(process.env.REDIS_PORT!),
+    AWS_REGION: process.env.AWS_REGION!,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID!,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY!,
+    AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME!,
 };
