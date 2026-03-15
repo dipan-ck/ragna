@@ -23,12 +23,11 @@ export async function confirmUpload(req: Request, res: Response) {
     if (!parsed.success)
         return void res.status(400).json(z.treeifyError(parsed.error));
 
-    const file = await fileService.confirmUpload(
-        parsed.data.fileId,
-        req.user!.id,
-    );
+    const file = await fileService.confirmUpload({
+        ...parsed.data,
+        userId: req.user!.id,
+    });
     if (!file) return void res.status(404).json({ error: "File not found" });
-
     res.json({ success: true });
 }
 
@@ -74,4 +73,16 @@ export async function deleteFile(
     );
     if (!result) return void res.status(404).json({ error: "File not found" });
     res.json({ message: "File deleted" });
+}
+
+export async function getFileDownloadUrl(
+    req: Request<{ fileId: string }>,
+    res: Response,
+) {
+    const result = await fileService.getFileDownloadUrl(
+        req.params.fileId,
+        req.user!.id,
+    );
+    if (!result) return void res.status(404).json({ error: "File not found" });
+    res.json(result);
 }

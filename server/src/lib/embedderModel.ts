@@ -8,8 +8,9 @@ export async function embedChunks(chunks: string[]): Promise<number[][]> {
 
     for (const chunk of chunks) {
         const result = await genai.models.embedContent({
-            model: "gemini-embedding-exp-03-07",
-            contents: chunk,
+            model: "gemini-embedding-001",
+            contents: chunks,
+            config: { outputDimensionality: 1024 },
         });
         embeddings.push(result.embeddings![0].values!);
     }

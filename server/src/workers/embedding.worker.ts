@@ -64,6 +64,7 @@ new Worker(
                 where: { id: fileId },
                 data: { status: "READY" },
             });
+            console.log(`Embedding worker: processed file ${fileId}`);
         } catch (error) {
             await prisma.file.update({
                 where: { id: fileId },

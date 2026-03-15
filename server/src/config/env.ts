@@ -22,4 +22,5 @@ export const env = {
     PINECONE_API_KEY: process.env.PINECONE_API_KEY!,
     PINECONE_INDEX: process.env.PINECONE_INDEX!,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY!,
+    TRUSTED_ORIGINS: process.env.TRUSTED_ORIGINS?.split(","),
 };

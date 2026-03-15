@@ -24,45 +24,52 @@ export async function createUploadUrl({
     });
     if (!project) return null;
 
-    const key = `projects/${projectId}/${crypto.randomUUID()}-${filename}`;
-
-    const file = await prisma.file.create({
-        data: {
-            name: filename,
-            mimeType,
-            s3Key: key,
-            projectId,
-            status: "UPLOADING",
-        },
-    });
+    const s3Key = `projects/${projectId}/${crypto.randomUUID()}-${filename}`;
 
     const command = new PutObjectCommand({
         Bucket: env.AWS_BUCKET_NAME,
-        Key: key,
+        Key: s3Key,
         ContentType: mimeType,
     });
 
     const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
 
-    return { uploadUrl, fileId: file.id };
+    return { uploadUrl, s3Key }; // no DB insert here anymore
 }
 
-export async function confirmUpload(fileId: string, userId: string) {
-    const file = await prisma.file.findFirst({
-        where: { id: fileId, project: { userId } },
+export async function confirmUpload({
+    projectId,
+    userId,
+    filename,
+    mimeType,
+    s3Key,
+    size,
+}: {
+    projectId: string;
+    userId: string;
+    filename: string;
+    mimeType: string;
+    s3Key: string;
+    size: number;
+}) {
+    const project = await prisma.project.findFirst({
+        where: { id: projectId, userId },
+    });
+    if (!project) return null;
+
+    const file = await prisma.file.create({
+        data: {
+            name: filename,
+            mimeType,
+            s3Key,
+            projectId,
+            size,
+            status: "UPLOADED",
+        },
     });
 
-    if (!file) return null;
-    if (file.status !== "UPLOADING") return null;
-
-    const updated = await prisma.file.update({
-        where: { id: fileId },
-        data: { status: "UPLOADED" },
-    });
-
-    await embeddingQueue.add("process-file", { fileId });
-
-    return updated;
+    await embeddingQueue.add("process-file", { fileId: file.id });
+    return file;
 }
 
 export async function getProjectFiles(projectId: string, userId: string) {
@@ -131,8 +138,13 @@ export async function deleteProjectFiles(projectId: string) {
         );
     }
 
-    const index = getPineconeIndex().namespace(projectId);
-    await index.deleteAll();
+    try {
+        const index = getPineconeIndex().namespace(projectId);
+        await index.deleteAll();
+    } catch (error: any) {
+        if (error?.name === "PineconeNotFoundError") return;
+        throw error;
+    }
 }
 export async function deleteFile(fileId: string, userId: string) {
     const file = await prisma.file.findFirst({
@@ -140,7 +152,6 @@ export async function deleteFile(fileId: string, userId: string) {
     });
     if (!file) return null;
 
-    // delete from S3
     await s3.send(
         new DeleteObjectCommand({
             Bucket: env.AWS_BUCKET_NAME,
@@ -148,11 +159,14 @@ export async function deleteFile(fileId: string, userId: string) {
         }),
     );
 
-    const index = getPineconeIndex().namespace(file.projectId);
-    await index.deleteMany({ filter: { fileId: { $eq: fileId } } });
+    try {
+        const index = getPineconeIndex().namespace(file.projectId);
+        await index.deleteMany({ filter: { fileId: { $eq: fileId } } });
+    } catch (error: any) {
+        if (error?.name !== "PineconeNotFoundError") throw error;
+    }
 
     await prisma.file.delete({ where: { id: fileId } });
-
     return true;
 }
 
@@ -167,4 +181,17 @@ export async function downloadFileFromS3(s3Key: string): Promise<Buffer> {
         chunks.push(chunk);
     }
     return Buffer.concat(chunks);
+}
+
+export async function getFileDownloadUrl(fileId: string, userId: string) {
+    const file = await prisma.file.findFirst({
+        where: { id: fileId, project: { userId } },
+    });
+    if (!file) return null;
+    const command = new GetObjectCommand({
+        Bucket: env.AWS_BUCKET_NAME,
+        Key: file.s3Key,
+    });
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    return { url, name: file.name, mimeType: file.mimeType };
 }

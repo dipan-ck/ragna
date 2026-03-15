@@ -4,9 +4,8 @@ import { requireAuth } from "../../middlewares/auth.middleware.js";
 
 const router = Router();
 // router
+router.get("/", requireAuth, projectController.getAllProjects);
 router.get("/:id", requireAuth, projectController.getProject);
-router.get("/get-all", requireAuth, projectController.getAllProjects);
-
 router.post("/create", requireAuth, projectController.createProject);
 
 router.patch("/:id/title", requireAuth, projectController.updateProjectTitle);

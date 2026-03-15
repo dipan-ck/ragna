@@ -17,5 +17,9 @@ export const uploadUrlSchema = z.object({
 });
 
 export const confirmUploadSchema = z.object({
-    fileId: z.string(),
+    projectId: z.string(),
+    filename: z.string().min(1),
+    mimeType: z.enum(ALLOWED_MIME_TYPES),
+    s3Key: z.string().min(1),
+    size: z.number(),
 });
