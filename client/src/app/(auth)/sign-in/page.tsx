@@ -1,22 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { signIn } from "@/lib/auth-client";
+import { signIn, authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Github, Loader2, Eye, EyeOff } from "lucide-react";
 
@@ -29,8 +21,15 @@ type FormValues = z.infer<typeof schema>;
 
 export default function SignInPage() {
     const router = useRouter();
+    const { data: session, isPending } = authClient.useSession();
     const [showPassword, setShowPassword] = useState(false);
     const [serverError, setServerError] = useState("");
+
+    useEffect(() => {
+        if (!isPending && session) {
+            router.replace("/");
+        }
+    }, [session, isPending, router]);
 
     const {
         control,
@@ -55,20 +54,67 @@ export default function SignInPage() {
         router.push("/");
     }
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-background px-4">
-            <Card className="w-full max-w-md shadow-xl border-border/50">
-                <CardHeader className="space-y-1 pb-4">
-                    <CardTitle className="text-2xl font-semibold tracking-tight">
-                        Welcome back
-                    </CardTitle>
-                    <CardDescription>
-                        Sign in to your account to continue
-                    </CardDescription>
-                </CardHeader>
+    if (isPending || session) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
 
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
+    return (
+        <div className="min-h-screen flex">
+            {/* Left — cover image */}
+            <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-900 flex-col">
+                <img
+                    src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80"
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover opacity-60"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="relative mt-auto p-10 z-10">
+                    <div className="flex items-center gap-2.5 mb-8">
+                        <div className="h-7 w-7 rounded-lg bg-white flex items-center justify-center">
+                            <span className="text-black text-xs font-bold">
+                                R
+                            </span>
+                        </div>
+                        <span className="text-white font-semibold text-sm">
+                            Ragna
+                        </span>
+                    </div>
+                    <p className="text-white/90 text-lg font-medium leading-relaxed max-w-xs">
+                        Upload your files and have intelligent conversations
+                        about them
+                    </p>
+                    <p className="text-white/50 text-sm mt-2">
+                        Powered by retrieval-augmented generation
+                    </p>
+                </div>
+            </div>
+
+            {/* Right — form */}
+            <div className="flex-1 flex items-center justify-center px-6 py-12 bg-background">
+                <div className="w-full max-w-sm">
+                    <div className="flex items-center gap-2 mb-8 lg:hidden">
+                        <div className="h-7 w-7 rounded-lg bg-foreground flex items-center justify-center">
+                            <span className="text-background text-xs font-bold">
+                                R
+                            </span>
+                        </div>
+                        <span className="font-semibold text-sm">Ragna</span>
+                    </div>
+
+                    <div className="mb-7">
+                        <h1 className="text-2xl font-semibold tracking-tight">
+                            Welcome back
+                        </h1>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Sign in to your account to continue
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mb-5">
                         <Button
                             variant="outline"
                             type="button"
@@ -116,11 +162,11 @@ export default function SignInPage() {
                         </Button>
                     </div>
 
-                    <div className="relative">
+                    <div className="relative mb-5">
                         <div className="absolute inset-0 flex items-center">
                             <Separator />
                         </div>
-                        <div className="relative flex justify-center text-xs uppercase">
+                        <div className="relative flex justify-center text-xs">
                             <span className="bg-background px-2 text-muted-foreground">
                                 or continue with email
                             </span>
@@ -129,7 +175,7 @@ export default function SignInPage() {
 
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="space-y-3"
+                        className="space-y-4"
                     >
                         <Controller
                             name="email"
@@ -219,10 +265,8 @@ export default function SignInPage() {
                             )}
                         </Button>
                     </form>
-                </CardContent>
 
-                <CardFooter className="justify-center">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground text-center mt-6">
                         No account?{" "}
                         <Link
                             href="/sign-up"
@@ -231,8 +275,8 @@ export default function SignInPage() {
                             Sign up
                         </Link>
                     </p>
-                </CardFooter>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 }

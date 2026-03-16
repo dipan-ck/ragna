@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { conversationsApi } from "@/api/conversation";
+import { useState } from "react";
 
 export const CONVERSATION_KEYS = {
     project: (projectId: string) => ["conversations", projectId] as const,
@@ -49,13 +50,34 @@ export function useMessages(conversationId: string | null) {
 
 export function useSendMessage(conversationId: string) {
     const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (content: string) =>
-            conversationsApi.sendMessage(conversationId, content),
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: MESSAGE_KEYS.conversation(conversationId),
-            });
+    const [isStreaming, setIsStreaming] = useState(false);
+
+    const send = async (
+        content: string,
+        options: {
+            onChunk: (chunk: string) => void;
+            onSuccess: () => void;
+            onError: (err: string) => void;
         },
-    });
+    ) => {
+        setIsStreaming(true);
+        await conversationsApi.sendMessage(
+            conversationId,
+            content,
+            options.onChunk,
+            () => {
+                setIsStreaming(false);
+                queryClient.invalidateQueries({
+                    queryKey: MESSAGE_KEYS.conversation(conversationId),
+                });
+                options.onSuccess();
+            },
+            (err) => {
+                setIsStreaming(false);
+                options.onError(err);
+            },
+        );
+    };
+
+    return { send, isStreaming };
 }

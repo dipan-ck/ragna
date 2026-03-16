@@ -35,9 +35,6 @@ export function UserMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                <span className="hidden text-sm font-medium sm:block">
-                    {user.name}
-                </span>
                 <Avatar className="h-8 w-8">
                     <AvatarImage src={user.image ?? ""} alt={user.name ?? ""} />
                     <AvatarFallback className="text-xs">
@@ -60,7 +57,7 @@ export function UserMenu() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem
-                        onClick={() => router.push(`/${user.id}`)}
+                        onClick={() => router.push(`/profile/${user.id}`)}
                     >
                         <User className="mr-2 h-4 w-4" />
                         View profile

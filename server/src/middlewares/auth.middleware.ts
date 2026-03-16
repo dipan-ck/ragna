@@ -7,7 +7,7 @@ export const requireAuth = async (
     res: Response,
     next: NextFunction,
 ) => {
-    if (env.NODE_ENV === "development" && env.DEV_USER_ID) {
+    if (env.DEV_USER_ID) {
         req.user = { id: env.DEV_USER_ID };
         return next();
     }

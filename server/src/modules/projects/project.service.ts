@@ -22,7 +22,15 @@ export async function updateProjectTitle(projectId: string, name: string) {
 export async function getAllProjects(userId: string) {
     return prisma.project.findMany({
         where: { userId },
-        orderBy: { createdAt: "desc" },
+        orderBy: { updatedAt: "desc" },
+        include: {
+            _count: {
+                select: {
+                    files: true,
+                    conversations: true,
+                },
+            },
+        },
     });
 }
 

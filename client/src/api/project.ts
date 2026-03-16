@@ -3,9 +3,12 @@ import { api } from "@/lib/axios";
 export type Project = {
     id: string;
     name: string;
-    instructions?: string;
     createdAt: string;
     updatedAt: string;
+    _count?: {
+        files: number;
+        conversations: number;
+    };
 };
 
 export const projectsApi = {

@@ -8,8 +8,7 @@ import { embedChunks } from "../lib/embedderModel.js";
 import { downloadFileFromS3 } from "../modules/files/file.service.js";
 
 const connection = {
-    host: env.REDIS_HOST,
-    port: Number(env.REDIS_PORT ?? 6379),
+    url: env.UPSTASH_REDIS_URL,
     maxRetriesPerRequest: null,
 };
 

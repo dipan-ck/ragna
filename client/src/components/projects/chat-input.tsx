@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { ArrowUp, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 export function ChatInput({
     value,
@@ -31,11 +32,11 @@ export function ChatInput({
     }
 
     return (
-        <div className="shrink-0 px-4 pb-5 pt-2">
-            <div className="max-w-3xl mx-auto">
+        <div className="shrink-0 px-4 pb-5 ">
+            <div className="max-w-4xl mx-auto">
                 <div
                     className={cn(
-                        "flex flex-col rounded-2xl border border-border bg-background shadow-sm transition-shadow",
+                        "flex flex-col rounded-2xl bg-background/60 border border-border shadow-sm scrollbar-thin  transition-shadow",
                         "focus-within:shadow-md focus-within:border-ring/50",
                     )}
                 >
@@ -47,14 +48,15 @@ export function ChatInput({
                         placeholder="Ask a question about your files..."
                         disabled={disabled}
                         rows={1}
-                        className="w-full resize-none bg-transparent px-4 pt-3.5 pb-2 text-sm outline-none placeholder:text-muted-foreground/60 min-h-[52px] max-h-40 disabled:opacity-50"
+                        className="w-full resize-none bg-transparent px-4 pt-3.5 pb-2 text-basej:w
+                        outline-none  scrollbar-thin  placeholder:text-muted-foreground/60 min-h-13 max-h-70 disabled:opacity-50"
                         style={{ height: "auto" }}
                     />
                     <div className="flex items-center justify-between px-3 pb-2.5 pt-1">
                         <p className="text-xs text-muted-foreground/50 select-none">
                             Enter to send · Shift+Enter for new line
                         </p>
-                        <button
+                        <Button
                             onClick={onSend}
                             disabled={!value.trim() || disabled}
                             className={cn(
@@ -69,7 +71,7 @@ export function ChatInput({
                             ) : (
                                 <ArrowUp className="h-3.5 w-3.5" />
                             )}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

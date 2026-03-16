@@ -54,11 +54,44 @@ export const conversationsApi = {
     sendMessage: async (
         conversationId: string,
         content: string,
-    ): Promise<Message> => {
-        const { data } = await api.post(
-            `/api/conversation/${conversationId}/messages`,
-            { content },
+        onChunk: (chunk: string) => void,
+        onDone: () => void,
+        onError: (err: string) => void,
+    ): Promise<void> => {
+        const baseURL =
+            process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:8000";
+        const response = await fetch(
+            `${baseURL}/api/conversation/${conversationId}/messages`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ content }),
+            },
         );
-        return data;
+
+        if (!response.ok || !response.body) {
+            onError("Failed to send message");
+            return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const lines = decoder.decode(value).split("\n");
+            for (const line of lines) {
+                if (!line.startsWith("data: ")) continue;
+                try {
+                    const parsed = JSON.parse(line.slice(6));
+                    if (parsed.chunk) onChunk(parsed.chunk);
+                    if (parsed.done) onDone();
+                    if (parsed.error) onError(parsed.error);
+                } catch {}
+            }
+        }
     },
 };

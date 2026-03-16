@@ -1,16 +1,17 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     useProjectConversations,
     useCreateConversation,
     useDeleteConversation,
 } from "@/hooks/use-conversations";
-import { useProjectStore } from "@/store/project-store";
 import { FilesModal } from "./files-modal";
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
@@ -20,6 +21,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSkeleton,
+    SidebarTrigger,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import {
     AlertDialog,
@@ -39,50 +42,66 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
     MessageSquare,
     Plus,
-    Files,
-    ArrowLeft,
+    FolderOpen,
     MoreHorizontal,
     Trash2,
     Loader2,
+    ArrowLeft,
+    Home,
+    PanelLeftClose,
+    PanelLeftOpen,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { Conversation } from "@/api/conversation";
 
 function ConversationItem({
     conversation,
+    isActive,
+    projectId,
     onDelete,
 }: {
     conversation: Conversation;
+    isActive: boolean;
+    projectId: string;
     onDelete: (id: string, title: string) => void;
 }) {
-    const { activeConversationId, setActiveConversationId } = useProjectStore();
-    const isActive = activeConversationId === conversation.id;
+    const router = useRouter();
 
     return (
         <SidebarMenuItem>
             <SidebarMenuButton
                 isActive={isActive}
-                className="pr-8"
-                onClick={() => setActiveConversationId(conversation.id)}
+                tooltip={conversation.title ?? "Untitled"}
+                onClick={() =>
+                    router.push(
+                        `/project/${projectId}?conversation=${conversation.id}`,
+                    )
+                }
+                className={cn(
+                    "h-8 rounded-md text-sm",
+                    isActive && "font-medium",
+                )}
             >
                 <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate text-sm">
+                <span className="truncate">
                     {conversation.title ?? "Untitled"}
                 </span>
             </SidebarMenuButton>
             <SidebarMenuAction showOnHover>
                 <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <button className="flex items-center justify-center h-full w-full">
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-5 w-5">
                             <MoreHorizontal className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-36">
                         <DropdownMenuGroup>
                             <DropdownMenuItem
-                                className="text-destructive focus:text-destructive"
+                                className="text-destructive focus:text-destructive focus:bg-destructive/10"
                                 onClick={() =>
                                     onDelete(
                                         conversation.id,
@@ -90,7 +109,7 @@ function ConversationItem({
                                     )
                                 }
                             >
-                                <Trash2 className="mr-2 h-4 w-4" />
+                                <Trash2 className="mr-2 h-3.5 w-3.5" />
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
@@ -101,26 +120,33 @@ function ConversationItem({
     );
 }
 
-export function ProjectSidebar() {
-    const { projectId, activeConversationId, setActiveConversationId } =
-        useProjectStore();
+export function ProjectSidebar({
+    projectId,
+    activeConversationId,
+}: {
+    projectId: string;
+    activeConversationId: string | null;
+}) {
+    const router = useRouter();
+    const { state } = useSidebar();
+    const isCollapsed = state === "collapsed";
     const [filesOpen, setFilesOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<{
         id: string;
         title: string;
     } | null>(null);
 
-    const { data: conversations, isLoading } = useProjectConversations(
-        projectId ?? "",
-    );
+    const { data: conversations, isLoading } =
+        useProjectConversations(projectId);
     const { mutate: createConversation, isPending: isCreating } =
-        useCreateConversation(projectId ?? "");
+        useCreateConversation(projectId);
     const { mutate: deleteConversation, isPending: isDeleting } =
-        useDeleteConversation(projectId ?? "");
+        useDeleteConversation(projectId);
 
     function handleCreate() {
         createConversation(undefined, {
-            onSuccess: (conv) => setActiveConversationId(conv.id),
+            onSuccess: (conv) =>
+                router.push(`/project/${projectId}?conversation=${conv.id}`),
         });
     }
 
@@ -129,7 +155,7 @@ export function ProjectSidebar() {
         deleteConversation(deleteTarget.id, {
             onSuccess: () => {
                 if (activeConversationId === deleteTarget.id)
-                    setActiveConversationId(null);
+                    router.push(`/project/${projectId}`);
                 setDeleteTarget(null);
             },
         });
@@ -137,101 +163,169 @@ export function ProjectSidebar() {
 
     return (
         <>
-            <Sidebar>
-                <div className="flex flex-col h-full bg-sidebar border shadow-sm overflow-hidden">
-                    <SidebarHeader className="border-b px-3 py-2.5 space-y-2.5">
-                        <div className="flex items-center gap-2">
+            <Sidebar collapsible="icon">
+                {/* ── Header ── */}
+                <SidebarHeader className="p-3">
+                    {isCollapsed ? (
+                        <SidebarTrigger>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 shrink-0"
+                                className="h-8 w-8"
                             >
-                                <Link href="/">
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
+                                <PanelLeftOpen className="h-4 w-4" />
                             </Button>
-                            <span className="font-semibold text-sm truncate flex-1">
-                                Project
-                            </span>
+                        </SidebarTrigger>
+                    ) : (
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <span className="font-semibold text-xl">
+                                    Ragna
+                                </span>
+                            </div>
+                            <SidebarTrigger>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-muted-foreground"
+                                >
+                                    <PanelLeftClose className="h-4 w-4" />
+                                </Button>
+                            </SidebarTrigger>
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                    )}
+                </SidebarHeader>
+
+                <Separator />
+
+                {/* ── Action buttons ── */}
+                <div className="p-3 flex flex-col gap-1.5">
+                    {isCollapsed ? (
+                        <>
                             <Button
-                                variant="outline"
+                                variant="secondary"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={handleCreate}
+                                disabled={isCreating}
+                                title="New conversation"
+                            >
+                                {isCreating ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Plus className="h-4 w-4" />
+                                )}
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setFilesOpen(true)}
+                                title="Files"
+                            >
+                                <FolderOpen className="h-4 w-4" />
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                variant="ghost"
                                 size="sm"
-                                className="w-full text-xs"
+                                className="w-full justify-start h-9"
                                 onClick={handleCreate}
                                 disabled={isCreating}
                             >
                                 {isCreating ? (
-                                    <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                                    <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
                                 ) : (
-                                    <Plus className="h-3.5 w-3.5 mr-1.5" />
+                                    <Plus className="h-3.5 w-3.5 mr-2" />
                                 )}
-                                New chat
+                                New conversation
                             </Button>
                             <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
-                                className="w-full text-xs"
+                                className="w-full justify-start h-9"
                                 onClick={() => setFilesOpen(true)}
                             >
-                                <Files className="h-3.5 w-3.5 mr-1.5" />
+                                <FolderOpen className="h-3.5 w-3.5 mr-2" />
                                 Files
                             </Button>
-                        </div>
-                    </SidebarHeader>
-
-                    <SidebarContent className="flex-1 overflow-y-auto">
-                        <SidebarGroup>
-                            <SidebarGroupLabel className="text-xs px-4">
-                                Conversations
-                            </SidebarGroupLabel>
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    {isLoading ? (
-                                        Array.from({ length: 5 }).map(
-                                            (_, i) => (
-                                                <SidebarMenuSkeleton key={i} />
-                                            ),
-                                        )
-                                    ) : conversations?.length === 0 ? (
-                                        <div className="px-3 py-8 text-center">
-                                            <p className="text-xs text-muted-foreground">
-                                                No conversations yet
-                                            </p>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="mt-2 h-7 text-xs"
-                                                onClick={handleCreate}
-                                            >
-                                                <Plus className="h-3.5 w-3.5 mr-1" />
-                                                Start one
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        conversations?.map((conv) => (
-                                            <ConversationItem
-                                                key={conv.id}
-                                                conversation={conv}
-                                                onDelete={(id, title) =>
-                                                    setDeleteTarget({
-                                                        id,
-                                                        title,
-                                                    })
-                                                }
-                                            />
-                                        ))
-                                    )}
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                    </SidebarContent>
+                        </>
+                    )}
                 </div>
+
+                <Separator />
+
+                {/* ── Conversations list ── */}
+                <SidebarContent className="group-data-[collapsible=icon]:hidden">
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Conversations</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {isLoading ? (
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <SidebarMenuSkeleton key={i} />
+                                    ))
+                                ) : conversations?.length === 0 ? (
+                                    <div className="px-2 py-8 text-center space-y-2">
+                                        <p className="text-xs text-muted-foreground">
+                                            No conversations yet
+                                        </p>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-7 text-xs"
+                                            onClick={handleCreate}
+                                        >
+                                            <Plus className="h-3 w-3 mr-1" />
+                                            Start one
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    conversations?.map((conv) => (
+                                        <ConversationItem
+                                            key={conv.id}
+                                            conversation={conv}
+                                            isActive={
+                                                activeConversationId === conv.id
+                                            }
+                                            projectId={projectId}
+                                            onDelete={(id, title) =>
+                                                setDeleteTarget({ id, title })
+                                            }
+                                        />
+                                    ))
+                                )}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+
+                {/* ── Footer ── */}
+                <SidebarFooter className="p-3">
+                    <Separator className="mb-3" />
+                    {isCollapsed ? (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            title="Back to projects"
+                        >
+                            <Link href="/">
+                                <Home className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                    ) : (
+                        <Button variant="secondary">
+                            <Link href="/">Back to projects</Link>
+                        </Button>
+                    )}
+                </SidebarFooter>
             </Sidebar>
 
             <FilesModal
-                projectId={projectId ?? ""}
+                projectId={projectId}
                 open={filesOpen}
                 onOpenChange={setFilesOpen}
             />

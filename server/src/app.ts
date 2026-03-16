@@ -19,6 +19,7 @@ app.use(
             }
         },
         credentials: true,
+        exposedHeaders: ["Content-Type"],
     }),
 );
 

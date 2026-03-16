@@ -76,12 +76,36 @@ export async function sendMessage(
     const { content } = req.body;
     if (!content?.trim())
         return void res.status(400).json({ error: "Content required" });
-    const result = await conversationService.sendMessage(
-        req.params.conversationId,
-        req.user!.id,
-        content,
-    );
-    if (!result)
-        return void res.status(404).json({ error: "Conversation not found" });
-    res.json(result);
+
+    // Set SSE headers for streaming
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no"); // important for nginx
+    res.flushHeaders();
+
+    try {
+        await conversationService.sendMessageStream(
+            req.params.conversationId,
+            req.user!.id,
+            content,
+            (chunk: string) => {
+                res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
+            },
+        );
+        // Signal stream end
+        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    } catch (err: any) {
+        if (err.message === "NOT_FOUND") {
+            res.write(
+                `data: ${JSON.stringify({ error: "Conversation not found" })}\n\n`,
+            );
+        } else {
+            res.write(
+                `data: ${JSON.stringify({ error: "Something went wrong" })}\n\n`,
+            );
+        }
+    } finally {
+        res.end();
+    }
 }
