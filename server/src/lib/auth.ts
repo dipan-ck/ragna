@@ -49,3 +49,30 @@ export const auth = betterAuth({
         },
     },
 });
+
+// **** use this in local development *****
+
+// export const auth = betterAuth({
+//     baseURL: env.BETTER_AUTH_URL,
+
+//     trustedOrigins: ["http://localhost:3000"],
+
+//     database: prismaAdapter(prisma, {
+//         provider: "postgresql",
+//     }),
+
+//     emailAndPassword: {
+//         enabled: true,
+//     },
+
+//     socialProviders: {
+//         github: {
+//             clientId: env.GITHUB_CLIENT_ID as string,
+//             clientSecret: env.GITHUB_CLIENT_SECRET as string,
+//         },
+//         google: {
+//             clientId: env.GOOGLE_CLIENT_ID as string,
+//             clientSecret: env.GOOGLE_CLIENT_SECRET as string,
+//         },
+//     },
+// });

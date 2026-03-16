@@ -52,7 +52,21 @@ export function ChatView({
         };
         setOptimisticMessages([optimisticUserMsg]);
         setStreamingContent("");
-        // ...
+
+        // THIS BLOCK WAS MISSING — replaced by // ...
+        send(content, {
+            onChunk: (chunk) => {
+                setStreamingContent((prev) => (prev ?? "") + chunk);
+            },
+            onSuccess: () => {
+                setStreamingContent(null);
+                setOptimisticMessages([]);
+            },
+            onError: () => {
+                setStreamingContent(null);
+                setOptimisticMessages([]);
+            },
+        });
     }
 
     function handleReuse(content: string) {
