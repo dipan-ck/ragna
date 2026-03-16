@@ -5,13 +5,24 @@ import { env } from "../config/env.js";
 
 export const auth = betterAuth({
     baseURL: env.BETTER_AUTH_URL,
-    trustedOrigins: env.TRUSTED_ORIGINS ?? [],
+
+    trustedOrigins: ["https://ragna.dipanck.com"],
+
+    advanced: {
+        crossSubDomainCookies: {
+            enabled: true,
+            domain: ".ragna.dipanck.com",
+        },
+    },
+
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
+
     emailAndPassword: {
         enabled: true,
     },
+
     socialProviders: {
         github: {
             clientId: env.GITHUB_CLIENT_ID as string,

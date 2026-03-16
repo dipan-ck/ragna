@@ -168,7 +168,6 @@ function FileCard({
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger
-                            asChild
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Button
