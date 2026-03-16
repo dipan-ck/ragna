@@ -11,7 +11,22 @@ export const auth = betterAuth({
     advanced: {
         crossSubDomainCookies: {
             enabled: true,
-            domain: ".ragna.dipanck.com",
+            domain: ".dipanck.com", // root domain with leading dot — NOT .ragna.dipanck.com
+        },
+        defaultCookieAttributes: {
+            sameSite: "lax",
+            secure: true,
+            httpOnly: true,
+        },
+        cookies: {
+            session_token: {
+                attributes: {
+                    sameSite: "lax",
+                    secure: true,
+                    domain: ".dipanck.com",
+                    path: "/",
+                },
+            },
         },
     },
 
