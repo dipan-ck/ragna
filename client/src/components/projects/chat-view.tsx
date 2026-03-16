@@ -45,27 +45,14 @@ export function ChatView({
         setInput("");
 
         const optimisticUserMsg: Message = {
-            id: `optimistic-${Date.now()}`,
+            id: `optimistic-${crypto.randomUUID()}`,
             role: "USER",
             content,
             createdAt: new Date().toISOString(),
         };
         setOptimisticMessages([optimisticUserMsg]);
         setStreamingContent("");
-
-        send(content, {
-            onChunk: (chunk) => {
-                setStreamingContent((prev) => (prev ?? "") + chunk);
-            },
-            onSuccess: () => {
-                setStreamingContent(null);
-                setOptimisticMessages([]);
-            },
-            onError: () => {
-                setStreamingContent(null);
-                setOptimisticMessages([]);
-            },
-        });
+        // ...
     }
 
     function handleReuse(content: string) {

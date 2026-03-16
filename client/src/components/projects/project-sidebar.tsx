@@ -93,7 +93,7 @@ function ConversationItem({
             </SidebarMenuButton>
             <SidebarMenuAction showOnHover>
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger>
                         <Button variant="ghost" size="icon" className="h-5 w-5">
                             <MoreHorizontal className="h-3.5 w-3.5" />
                         </Button>
